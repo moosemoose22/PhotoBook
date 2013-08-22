@@ -1,7 +1,7 @@
 <?
-	include("dbconnect.php");
+	include("../_sharedIncludes/dbconnect.php");
 	include("checkLogin.php");
-	include("globals.php");
+	include("../_sharedIncludes/globals.php");
 	// Book data population ***********************************
 	$book_str = "SELECT BookID, BookTitle
 				FROM Books
@@ -20,7 +20,7 @@
 	if (sizeof($book_array) == 1)
 	{
 		$_SESSION["BookID"] = $book_array[0][0];
-header("Location: /book/book_admin.php"); 
+header("Location: {$g_admin_location}book_admin.php"); 
 	}
 ?>
 <!DOCTYPE html>

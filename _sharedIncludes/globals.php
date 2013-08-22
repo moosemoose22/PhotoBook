@@ -3,6 +3,7 @@
 	$g_suffix_medium_image = "_med";
 	$g_suffix_small_image = "_small";
 	$g_image_web_location =  "/images/book/";
+	$g_admin_location =  "/book/admin/";
 	$g_system_image_web_location =  $g_image_web_location . "system/";
 	$g_image_web_location_user =  $g_image_web_location . $_SESSION["BookLoginUsername"] . "/";
 	$g_image_directory_path = "/home/orent/mainwebsite_html" . $g_image_web_location;

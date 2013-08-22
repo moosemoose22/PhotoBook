@@ -1,6 +1,6 @@
 <?php
-	include("dbconnect.php");
-	include("globals.php");
+	include("../_sharedIncludes/dbconnect.php");
+	include("../_sharedIncludes/globals.php");
 	
 	$articleID = $_REQUEST['ID'];
 	$articleInstanceID = $_REQUEST['instanceID'];

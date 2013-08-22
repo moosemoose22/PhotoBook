@@ -1,7 +1,7 @@
 <?php
 	include("SimpleImage_class.php");
-	include("dbconnect.php");
-	include("globals.php");
+	include("../_sharedIncludes/dbconnect.php");
+	include("../_sharedIncludes/globals.php");
 	
 	//echo $_REQUEST;
 	//print_r($_REQUEST['Ycoord']);

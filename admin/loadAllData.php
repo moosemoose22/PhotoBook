@@ -1,6 +1,6 @@
 <?php
-	include("dbconnect.php");
-	include("globals.php");
+	include("../_sharedIncludes/dbconnect.php");
+	include("../_sharedIncludes/globals.php");
 	$showAllData = ($_REQUEST['loadAllData'] == "true");
 	$showAllDataInitString = "mode=add&loggingIn=true";
 	

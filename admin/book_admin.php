@@ -1,7 +1,7 @@
 <?php
-	include("dbconnect.php");
+	include("../_sharedIncludes/dbconnect.php");
 	include("checkLogin.php");
-	include("globals.php");
+	include("../_sharedIncludes/globals.php");
 ?>
 <!DOCTYPE html>
 <html>

@@ -23,7 +23,7 @@
 		$LoginCount = $row['LoginCount'];
 
 		if ($LoginCount == 0)
-header("Location: /book/login.php?message=login_failed"); 
+header("Location: {$g_admin_location}login.php?message=login_failed"); 
 		else
 		{
 			$_SESSION["BookLoginUsername"] = $BookLoginUsername;
@@ -31,7 +31,7 @@ header("Location: /book/login.php?message=login_failed");
 			if (!isset($_SESSION["BookID"]))
 			{
 				if (basename($_SERVER['PHP_SELF']) == "book_admin.php")
-header("Location: /book/chooseBook.php"); 
+header("Location: {$g_admin_location}chooseBook.php"); 
 			}
 			else
 			{
@@ -47,5 +47,5 @@ header("Location: /book/chooseBook.php");
 		}
 	}
 	else
-header("Location: /book/login.php?message=initial_login"); 
+header("Location: {$g_admin_location}login.php?message=initial_login"); 
 ?>
