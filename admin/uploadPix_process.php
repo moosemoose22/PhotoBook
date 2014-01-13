@@ -1,7 +1,7 @@
 <?php
 	include("SimpleImage.php");
-	include("dbconnect.php");
-	include("globals.php");
+	include("../_sharedIncludes/dbconnect.php");
+	include("../_sharedIncludes/globals.php");
 	
 	/****************************
 		functions begin here
@@ -23,8 +23,8 @@
 		$extension = end(explode(".", $fileName));
 		//&& ($_FILES["file"]["size"] < 20000)
 		if ((($fileType == "image/gif") || ($fileType == "image/jpeg")
-		|| ($fileType == "image/png") || ($fileType == "image/pjpeg"))
-		&& in_array($extension, $allowedExts))
+			|| ($fileType == "image/png") || ($fileType == "image/pjpeg"))
+			&& in_array($extension, $allowedExts))
 		{
 			if (!$uploadedViaAjax && $_FILES["file"]["error"] > 0)
 				return "Error: " . $_FILES["file"]["error"];
@@ -62,10 +62,10 @@
 		$mysqli = $GLOBALS["mysqli"];
 		//$imageDirectoryPath = $GLOBALS["g_image_directory_path"];
 		//$imageDirectory = $_SESSION["BookLoginUsername"];
-		$g_fullImagePath = $GLOBALS["g_image_directory_path"] . $_SESSION["BookLoginUsername"];
+		$fullImagePath = $GLOBALS["g_image_directory_path"] . $_SESSION["BookLoginUsername"];
 	
 		$image = new SimpleImage();
-		$image->load($g_fullImagePath . "/" . $filename);
+		$image->load($fullImagePath . "/" . $filename);
 		$uploadedWidth = $image->getWidth();
 		$uploadedHeight = $image->getHeight();
 		if ($uploadedWidth > $uploadedHeight)
@@ -73,22 +73,24 @@
 		else
 			$image->resizeToHeight(($uploadedHeight > 1024) ? 1024 : $uploadedHeight);
 		
-		$new_filename = str_replace(".", $g_suffix_medium_image . ".", $filename);
-		$image->save($g_fullImagePath . "/" . $new_filename);
+		$new_filename = str_replace(".", $GLOBALS["g_suffix_medium_image"] . ".", $filename);
+		$image->save($fullImagePath . "/" . $new_filename);
 		
 		if ($uploadedWidth > $uploadedHeight)
 			$image->resizeToWidth(100);
 		else
 			$image->resizeToHeight(100);
 		
-		$new_filename = str_replace(".", $g_suffix_small_image . ".", $filename);
-		$image->save($g_fullImagePath . "/" . $new_filename);
+		$new_filename = str_replace(".", $GLOBALS["g_suffix_small_image"] . ".", $filename);
+		$image->save($fullImagePath . "/" . $new_filename);
 
 		$db_insert_str = "INSERT INTO BookPhotos (BookLoginUsername, BookPhotoURL, BookPhotoWidth, BookPhotoHeight, BookPhotoWidthSmall, BookPhotoHeightSmall)
 						VALUES ('" . $_SESSION["BookLoginUsername"] . "', '$filename', $uploadedWidth, $uploadedHeight, " . $image->getWidth() . ", " . $image->getHeight() . ");";
 		
 		$mysqli->query($db_insert_str);
-		return $mysqli->insert_id;
+		$photoDataForClient = $mysqli->insert_id . $GLOBALS["data_delimiter"] . $filename  . $GLOBALS["data_delimiter"] . $uploadedWidth
+			. $GLOBALS["data_delimiter"] . $uploadedHeight . $GLOBALS["data_delimiter"] . $image->getWidth() . $GLOBALS["data_delimiter"] . $image->getHeight();
+		return $photoDataForClient;
 	}
 
 	/*******************************
@@ -98,8 +100,8 @@
 	$result = uploadImage();
 	if (substr($result, 0, 6) != "Error:")
 	{
-		$photoID = resizeAndSaveToDB($result);
-		echo "Success!|$photoID|$result";
+		$photoDataForClient = resizeAndSaveToDB($result);
+		echo "Success:{$photoDataForClient}";
 	}
 	else
 		echo $result;

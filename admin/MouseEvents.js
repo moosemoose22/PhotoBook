@@ -65,7 +65,8 @@ function elementCloserToWhichIpad(elementID)
 function showRightClickMenu(e)
 {
 	$("#rightclick_menu").show();
-	$("#rightclick_menu").offset({ top: g_mouseY, left: g_mouseX } );
+	//$("#rightclick_menu").offset({ top: g_mouseY, left: g_mouseX } );
+	$("#rightclick_menu").offset({ top: 0, left: 0 } );
 	if (AdminManager.isPhotoInstance(e.target.getAttribute("id")))
 	{
 		g_objectClicked = e.target;
@@ -89,6 +90,14 @@ function showRightClickMenu(e)
 		g_objectClicked = e.target;
 		$("#menu_title").html("Article Options");
 		$('.resize_menu_option').css('display', '');
+		$('.move_menu_option').css('display', 'none');
+		$('.delete_menu_option').css('display', '');
+	}
+	else if (AdminPhotoManager.isPhotoOrig(e.target.getAttribute("id")))
+	{
+		g_objectClicked = e.target;
+		$("#menu_title").html("Delete Original Photo");
+		$('.resize_menu_option').css('display', 'none');
 		$('.move_menu_option').css('display', 'none');
 		$('.delete_menu_option').css('display', '');
 	}
@@ -122,7 +131,9 @@ function onMenuClick(menu_action)
 	else if (menu_action == "fill_both")
 		fillIpad('both');
 	else if (menu_action == "move_front")
-		moveFront();
+		moveObject("top");
+	else if (menu_action == "move_bottom")
+		moveObject("bottom");
 	else if (menu_action == "delete_instance")
 		deleteInstance();
 	else if (menu_action == "move_horizontal_iPad")
@@ -177,6 +188,14 @@ function onMenuClick(menu_action)
 				}
 			).draggable();
 			$("#toolbar").offset({ top: 0, left: g_horizontalOffsetLeft });			
+			$("table.icons tr td img").hover(
+				function () {
+					$(this).css("cursor", "pointer");
+				},
+				function () {
+					$(this).css("cursor", "default");
+				}
+			);
 			$("#ExitText").hover(
 				function () {
 					$(this).css("cursor", "default");

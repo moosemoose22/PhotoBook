@@ -64,10 +64,10 @@
 		}
 		else
 		{
-			$are_there_photo_instances_sql = "SELECT BookPagePhotoID
+			$are_there_photo_instances_str = "SELECT BookPagePhotoID
 											FROM BookPagePhotos
-											WHERE photoID = " . $_REQUEST['ID'] . ";";
-			$stmt = $mysqli->prepare($query);
+											WHERE BookPhotoID = " . $_REQUEST['ID'] . ";";
+			$stmt = $mysqli->prepare($are_there_photo_instances_str);
 			$stmt->execute();
 			$stmt->store_result();
 			$there_are_photo_instances = ($stmt->num_rows > 0);

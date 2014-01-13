@@ -1,5 +1,5 @@
 <?php
-	include("dbconnect.php");
+	include("../_sharedIncludes/dbconnect.php");
 	include("checkLogin.php");
 ?>
 <html>
@@ -91,8 +91,10 @@
 			{
 				if (xhr.readyState==4 && xhr.status==200)
 				{
-					if (xhr.responseText == "Success!")
+					if (xhr.responseText.substring(0, 8) == "Success:")
 					{
+						processSuccess(xhr.responseText.substring(8), window.self);
+					/*
 						var elem = document.getElementById("no-items");
 						if (elem)
 							elem.parentNode.removeChild(elem);
@@ -105,6 +107,8 @@
 					}
 					else
 						alert(xhr.responseText);
+					*/
+					}
 				}
 			}, false);
 /*
@@ -114,7 +118,7 @@
 					alert(xhr.responseText);
 			}
 */
-			xhr.open("post", "/book/uploadPix_process.php", true);
+			xhr.open("post", "/book/admin/uploadPix_process.php", true);
 			
 			// Set appropriate headers
 			xhr.setRequestHeader("Content-Type", "multipart/form-data");
@@ -200,10 +204,11 @@
 //	if (!$hasResults)
 //		echo "<li class=\"no-items\" id=\"no-items\">(no images)</li>";
 ?>
+			//showImages();
 			addListeners();
 		}
-
-		function addListeners()
+		
+		function showImages()
 		{
 			var img, imgSrc;
 			for (var photoID in g_photoMap)
@@ -219,6 +224,10 @@
 				document.getElementById(photoID).addEventListener('mousedown', mouseDown, false);
 			}
 			//document.getElementById("file-list").addEventListener('mousedown', mouseDown, false);
+		}
+
+		function addListeners()
+		{
 			window.addEventListener('mouseup', mouseUp, false);
 		}
 
@@ -246,7 +255,12 @@
 				img.offsetLeft += (e.clientX - img.offsetLeft);
 			}
 			//alert(img.style.left + "     " + img.offsetLeft);
-		}		
+		}	
+		
+		function processSuccess(text, winRef)
+		{
+			opener.processNewPhoto(text, winRef);
+		}	
 	</script>
 </head>
 <body onload="init()">

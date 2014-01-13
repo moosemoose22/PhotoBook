@@ -147,12 +147,12 @@
 		this.deleteObject = function(objectType, objectID, objectInstanceID, pageID)
 		{
 			var pageName;
-			if (objectType == "photo")
+			if (AdminManager.isPhotoObj(objectType))
 				pageName = g_photoAjaxPage;
-			else if (objectType == "article")
+			else if (AdminManager.isArticleObj(objectType))
 				pageName = g_articleAjaxPage;
 			var data = "mode=delete&ID=" + objectID;
-			if (typeof(objectInstanceID) != "undefined")
+			if (typeof(objectInstanceID) != "undefined" && objectInstanceID)
 				data += "&instanceID=" + objectInstanceID + "&pageID=" + pageID;
 			this.saveDataOnServer(data, pageName);
 		}
@@ -212,14 +212,16 @@
 					{
 						if (IDarray[0] == "Photo")
 						{
-							var divID = AdminPhotoManager.getPhotoWrapperDivID(data.substring(8));
+							var divID = AdminPhotoManager.getPhotoWrapperDivID(IDarray[1]);
 							$('#' + divID).remove();
+							Logger.log("Deleted Photo ID " + IDarray[1], "text", "from_server", "Delete photo");
 						}
 						else if (IDarray[0] == "PhotoInstance")
 						{
 							AdminPhotoManager.removePhotoInstance(IDarray[1], IDarray[2], IDarray[3]);
 							var divID = AdminPhotoManager.getPhotoInstanceWrapperDivID(IDarray[1], IDarray[2]);
 							$('#' + divID).remove();
+							Logger.log("Deleted Photo instance ID " + IDarray[1] + "_" + IDarray[2], "text", "from_server", "Delete photo instance");
 						}
 					}
 					else if (IDarray[0] == "Article" || IDarray[0] == "ArticleInstance")

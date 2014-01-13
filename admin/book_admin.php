@@ -344,6 +344,22 @@
 		}
 	}
 	
+	function uploadFile(fileType)
+	{
+		if (AdminManager.isPhotoObj(fileType))
+			window.open("uploadPix.php", "add_photos", "width=700, height=250");
+	}
+
+	function processNewPhoto(photoData, winRef)
+	{
+		var photoDataArray = photoData.split(g_dataDelimeter);
+		//AdminPhotoManager.addPhoto(ID, URL, regWidth, regHeight, smallWidth, smallHeight);
+		AdminPhotoManager.addPhoto(photoDataArray[0], photoDataArray[1], photoDataArray[2], photoDataArray[3], photoDataArray[4], photoDataArray[5]);
+		addJQueryEvents("#" + AdminPhotoManager.getPhotoWrapperDivID(photoDataArray[0]));
+	    if (winRef)
+	        winRef.close();
+	}
+	
 	function getBackgroundSize(stretchTofillBg, element)
 	{
 		if (stretchTofillBg)
@@ -405,8 +421,8 @@ function toggleToolbarOptions(cursor)
 	else
 	{
 		var ImageLocation = "/images/book/system/";
-		$("#ExitText").attr("src", (ImageLocation + ((cursor == "text") ? "Edit_Text_Icon_48_down.png" : "Edit_Text_Icon_48.png")));
-		$("#Arrow").attr("src", (ImageLocation + ((cursor == "default") ? "System_mouse_Icon_48_down.png" : "System_mouse_Icon_48.png")));
+		//$("#ExitText").attr("src", (ImageLocation + ((cursor == "text") ? "Edit_Text_Icon_48_down.png" : "Edit_Text_Icon_48.png")));
+		//$("#Arrow").attr("src", (ImageLocation + ((cursor == "default") ? "System_mouse_Icon_48_down.png" : "System_mouse_Icon_48.png")));
 	}
 }
 
@@ -434,12 +450,12 @@ function fillIpad(ipadOrientation)
 	}
 	return true;
 }
-	
-function moveFront()
+
+function moveObject(topOrBottom)
 {
 	var iPadOrientation = insideAnIpad(g_objectClicked, "horizontal") ? "horizontal" : "vertical";
 	var objectID = ($(g_objectClicked).attr('id'));
-	PageManager.moveToTop(objectID);
+	PageManager.moveObject(objectID, topOrBottom);
 }
 
 function deletePhoto()
@@ -451,7 +467,13 @@ function deletePhoto()
 
 function deleteInstance()
 {
-	if (AdminManager.isPhotoInstance($( g_objectClicked ).attr("id")))
+	if (AdminPhotoManager.isPhotoOrig($( g_objectClicked ).attr("id")))
+	{
+		var photoID = AdminPhotoManager.getPhotoIDfromDivID( $( g_objectClicked ).attr("id") );
+		if (confirm("Are you sure you want to delete this photo?\nThis will delete the photo from the server."))
+			Communicator.deleteObject(g_photoObjectType, photoID, null, PageManager.getCurrentPageID());
+	}
+	else if (AdminManager.isPhotoInstance($( g_objectClicked ).attr("id")))
 	{
 		var photoID = AdminPhotoManager.getPhotoIDfromDivID( $( g_objectClicked ).attr("id") );
 		var photoInstanceID = AdminPhotoManager.getPhotoInstanceIDfromDivID( $( g_objectClicked ).attr("id") );
@@ -536,7 +558,7 @@ function moveIPad(iPadType)
 		});
 		
 		$('body').click(function() {
-			$('#rightclick_menu').hide();
+			;//$('#rightclick_menu').hide();
 		});
 		window.resizeBy(1, 1);
 		StackOrderManager.init();
@@ -619,6 +641,7 @@ function moveIPad(iPadType)
   <li class="resize_menu_option" onclick="onMenuClick('fill_horizontal')"><a href="#">Fill screen horizontally</a></li>
   <li class="resize_menu_option" onclick="onMenuClick('fill_both')"><a href="#">Fill screen both ways</a></li>
   <li class="resize_menu_option" onclick="onMenuClick('move_front')"><a href="#">Move to front</a></li>
+  <li class="resize_menu_option" onclick="onMenuClick('move_bottom')"><a href="#">Move to bottom</a></li>
   <li class="delete_menu_option" onclick="onMenuClick('delete_instance')"><a href="#">Delete</a></li>
   <li class="move_menu_option" onclick="onMenuClick('delete_photo')"><a href="#">Delete</a></li>
   <li class="move_menu_option" onclick="onMenuClick('move_horizontal_iPad')"><a href="#">Move to horizontal iPad</a></li>
@@ -635,17 +658,7 @@ function moveIPad(iPadType)
     </ul>
   </li>
 -->
-	<div id="toolbar" style="position:absolute; z-index:10000; border: 1px solid black">
-		<table cellspacing="0" cellpadding="0">
-		<tr><td>Mode</td><td>Photo</td><td>Publish</td></tr>
-		<tr>
-		<td><img title="Text mode" src="<?=$g_system_image_web_location?>Edit_Text_Icon_48.png" id="ExitText" />
-		<img title="Mouse mode" src="<?=$g_system_image_web_location?>System_mouse_Icon_48_down.png" id="Arrow" />
-		</td><td><img title="Stretch image to fill" onclick="changeImageBehavior('fill');" src="<?=$g_system_image_web_location?>System_Photo_StretchToFill.gif" id="StretchImage" />
-		<img title="Keep original image proportions" onclick="changeImageBehavior('fit');" src="<?=$g_system_image_web_location?>System_Photo_FitInBorder.gif" id="FitImage" />
-		</td><td><img title="Publish book!" src="<?=$g_system_image_web_location?>System_the_scream.jpg" id="GenerateBook" />
-		</td></tr></table>
-	</div>
+	<? include("toolbar.inc") ?>
 	<div style="overflow-y:scroll; background-color: white; border: 1px solid black; position: relative; z-index:101" id="photos_div">Photos:<br/></div>
 	<div style="overflow-y:scroll; background-color: white; border: 1px solid black; position: relative; z-index:101" id="articles_div">Shared Articles:<br/></div>
 	<div id="masthead" class="sideBarDiv" style="width:100px;height:20px">
@@ -671,4 +684,4 @@ function moveIPad(iPadType)
 	<div id="story"></div>
 </body>
 </html>
-<? include("dbclose.php") ?>
+<? include("../_sharedIncludes/dbclose.php") ?>

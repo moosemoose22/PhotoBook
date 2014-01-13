@@ -258,7 +258,7 @@
 			else
 				objectObj.stackOrder = stackOrder;
 		}
-		this.moveToTop = function(divID)
+		this.moveObject = function(divID, topOrBottom)
 		{
 			var parentID, instanceID, objectType;
 			var pageID = this.getCurrentPageID();
@@ -283,21 +283,39 @@
 			var desiredObjectCurrentStackOrder = AdminManager.getStackOrder(parentID, instanceID, objectType);
 			var stackArrayCopy = pageObj.stackOrderArray.slice(0);
 			//var debugStr = "";
-			for (var stackArrayIndex = pageObj.stackOrderArray.length - 1; stackArrayIndex >= (desiredObjectCurrentStackOrder - 1); stackArrayIndex--)
+			if (topOrBottom == "top")
 			{
-				//debugStr += (stackArrayIndex + ",");
-				if (pageObj.stackOrderArray[stackArrayIndex].parentID == parentID && pageObj.stackOrderArray[stackArrayIndex].instanceID == instanceID)
+				for (var stackArrayIndex = pageObj.stackOrderArray.length - 1; stackArrayIndex >= (desiredObjectCurrentStackOrder - 1); stackArrayIndex--)
 				{
-					pageObj.stackOrderArray[stackArrayIndex].stackOrder = pageObj.stackOrderArray.length;
-					stackArrayCopy[stackArrayCopy.length - 1] = pageObj.stackOrderArray[stackArrayIndex];
-				}
-				else
-				{
-					pageObj.stackOrderArray[stackArrayIndex].stackOrder--;
-					stackArrayCopy[stackArrayIndex - 1] = pageObj.stackOrderArray[stackArrayIndex];
+					//debugStr += (stackArrayIndex + ",");
+					if (pageObj.stackOrderArray[stackArrayIndex].parentID == parentID && pageObj.stackOrderArray[stackArrayIndex].instanceID == instanceID)
+					{
+						pageObj.stackOrderArray[stackArrayIndex].stackOrder = pageObj.stackOrderArray.length;
+						stackArrayCopy[stackArrayCopy.length - 1] = pageObj.stackOrderArray[stackArrayIndex];
+					}
+					else
+					{
+						pageObj.stackOrderArray[stackArrayIndex].stackOrder--;
+						stackArrayCopy[stackArrayIndex - 1] = pageObj.stackOrderArray[stackArrayIndex];
+					}
 				}
 			}
-			//mydebug("PageManager.moveToTop: " + debugStr, true, true);
+			else if (topOrBottom == "bottom")
+			{
+				for (var stackArrayIndex = 0; stackArrayIndex < desiredObjectCurrentStackOrder; stackArrayIndex++)
+				{
+					if (pageObj.stackOrderArray[stackArrayIndex].parentID == parentID && pageObj.stackOrderArray[stackArrayIndex].instanceID == instanceID)
+					{
+						pageObj.stackOrderArray[stackArrayIndex].stackOrder = 1;
+						stackArrayCopy[0] = pageObj.stackOrderArray[stackArrayIndex];
+					}
+					else
+					{
+						pageObj.stackOrderArray[stackArrayIndex].stackOrder++;
+						stackArrayCopy[stackArrayIndex] = pageObj.stackOrderArray[stackArrayIndex];
+					}
+				}
+			}
 			pageObj.stackOrderArray = stackArrayCopy;
 			Communicator.saveStackOrder(pageID);
 		}
