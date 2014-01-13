@@ -1,0 +1,57 @@
+Mouse mode toolbar:
+	arrow tool
+	text tool
+		On clicking page, adds a text box to page that lets you type inside
+		On clicking an article, lets you edit it.
+	draw rectangle
+	draw circle
+	gradient rectangle
+	eye dropper
+	magnifying glass
+	line tool
+	pencil
+	drag page (possibly a hand?)
+
+paragraph tools (when text tool selected. otherwise, disabled)
+	align: left, center, right
+	paragraph indent: amount
+		checkbox for first paragraph only
+
+object tools (when arrow tool selected. otherwise, disabled)
+	rotate tool
+	color fill button
+		opens color picker dialog
+		slider next to button for color opacity. default: 100%
+	color border button
+		opens color picker dialog
+		slider next to button for color opacity. default: 100%
+	border size button/text box. Allow user to input amount
+	photo tools (active when arrow tool selected and a photo's been clicked. Otherwise, disabled):
+		Stretch photo to fill containing box on resize
+		Constrain photo to original image proportions on resize
+	text tools (active when arrow tool selected and an article's been clicked. Otherwise, disabled):
+		text wrap: none, wrap
+
+Book tools:
+	publish book
+	add book
+	add language to book (from pre-defined list)
+
+Articles tab:
+	Upload article (must choose language with article)
+	Edit uploaded article
+	Show all uploaded articles. Each article can be dragged onto the visible page
+	Translate book
+		Opens dialog:
+		Add a language to a book (from pre-defined list/drop-down)
+		Have all 
+
+Photos tab:
+	upload photo button
+	Show all uploaded photos. Each photo can be dragged onto the visible page
+
+Pages tab:
+	add page button
+	Show all pages in book
+
+language drop-down
