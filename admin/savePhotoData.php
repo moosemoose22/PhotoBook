@@ -88,9 +88,9 @@
 				$filename = $row['BookPhotoURL'];
 				$file_sql->free();
 				$fullImagePath = $GLOBALS["g_image_directory_path"] . $_SESSION["BookLoginUsername"];
-				$fullsize_filename = $fullImagePath . $filename;
-				$med_filename = str_replace(".", $g_suffix_medium_image . ".", $fullsize_filename);
-				$small_filename = str_replace(".", $g_suffix_small_image . ".", $fullsize_filename);
+				$fullsize_filename = $fullImagePath . "/" . $filename;
+				$med_filename = str_replace(".", $GLOBALS["g_suffix_medium_image"] . ".", $fullsize_filename);
+				$small_filename = str_replace(".", $GLOBALS["g_suffix_small_image"] . ".", $fullsize_filename);
 				if (is_file($fullsize_filename))
 					unlink($fullsize_filename);
 				if (is_file($med_filename))
