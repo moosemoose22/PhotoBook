@@ -2,8 +2,9 @@
 	include("../_sharedIncludes/dbconnect.php");
 	include("../_sharedIncludes/globals.php");
 	
-	$articleID = $_REQUEST['ID'];
-	$articleInstanceID = $_REQUEST['instanceID'];
+	$client_form_data = json_decode(file_get_contents('php://input'), true);
+	$articleID = $client_form_data['ID'];
+	$articleInstanceID = $client_form_data['instanceID'];
 	if (is_int($articleID))
 	{
 		$db_str = "SELECT BookArticleIsShared
@@ -14,7 +15,7 @@
 		$is_shared_instance = (intval($row['BookArticleIsShared']) == 1);
 		$is_book_shared_sql->free();
 	}
-	if ($_REQUEST['mode'] == "delete")
+	if ($client_form_data['mode'] == "delete")
 	{
 		if ($is_shared_instance)
 		{
@@ -37,65 +38,65 @@
 						WHERE BookArticleID = " . $articleID . ";";
 			$mysqli->query($db_str);
 		}
-		echo "Deleted:Article," . $articleID . "," . $articleInstanceID . "," . $_REQUEST['pageID'];
+		echo "Deleted:Article," . $articleID . "," . $articleInstanceID . "," . $client_form_data['pageID'];
 		exit(0);
 	}
-	else if ($_REQUEST['mode'] == "update")
+	else if ($client_form_data['mode'] == "update")
 	{
 		// Update article in DB ********************************
 		if (!$is_shared_instance)
 		{
 			$db_str = "UPDATE BookArticleLangs
-		 				SET BookArticleLangText = '" . $_REQUEST['articleText'] . "'
-		 				WHERE BookLangID = '" . $_REQUEST['LangID'] . "'
+		 				SET BookArticleLangText = '" . $client_form_data['articleText'] . "'
+		 				WHERE BookLangID = '" . $client_form_data['LangID'] . "'
 		 				AND BookArticleID = " . $articleID . ";";
 			$mysqli->query($db_str);
 		}
 		$db_str = "UPDATE BookPageArticles
 					SET BookPageArticleInstanceNum = " . $articleInstanceID;
-					if (isset($_REQUEST['orientation']))
-						$db_str .= ", BookPageArticleXCoord = '" . $_REQUEST['orientation'] . "'";
-					if (isset($_REQUEST['Xcoord']))
-						$db_str .= ", BookPageArticleXCoord = " . $_REQUEST['Xcoord'];
-					if (isset($_REQUEST['Ycoord']))
-						$db_str .= ", BookPageArticleYCoord = " . $_REQUEST['Ycoord'];
-					if (isset($_REQUEST['width']))
-						$db_str .= ", BookPageArticleWidth = " . $_REQUEST['width'];
-					if (isset($_REQUEST['height']))
-						$db_str .= ", BookPageArticleHeight = " . $_REQUEST['height'];
+					if (isset($client_form_data['orientation']))
+						$db_str .= ", BookPageArticleXCoord = '" . $client_form_data['orientation'] . "'";
+					if (isset($client_form_data['Xcoord']))
+						$db_str .= ", BookPageArticleXCoord = " . $client_form_data['Xcoord'];
+					if (isset($client_form_data['Ycoord']))
+						$db_str .= ", BookPageArticleYCoord = " . $client_form_data['Ycoord'];
+					if (isset($client_form_data['width']))
+						$db_str .= ", BookPageArticleWidth = " . $client_form_data['width'];
+					if (isset($client_form_data['height']))
+						$db_str .= ", BookPageArticleHeight = " . $client_form_data['height'];
 		$db_str .= " WHERE BookArticleID = " . $articleID . " 
 					AND BookPageArticleInstanceNum = " . $articleInstanceID . ";";
 		$mysqli->query($db_str);
 	}
-	else if ($_REQUEST['mode'] == "add")
+	else if ($client_form_data['mode'] == "add")
 	{
 		// Add article to DB if user typed new text in ********************************
-		$db_str = "INSERT INTO BookArticles (BookID) VALUES (" . $_REQUEST['BookID'] . ");";
+		$db_str = "INSERT INTO BookArticles (BookID) VALUES (" . $client_form_data['BookID'] . ");";
 		$mysqli->query($db_str);
 
 		$articleID = $mysqli->insert_id;
 		$db_str = "INSERT INTO BookArticleLangs (BookArticleID, BookArticleLangText, BookLangID)
-						VALUES (" . $articleID . ", '" . $_REQUEST['articleText'] . "', '" . $_REQUEST['LangID'] . "');";
+						VALUES (" . $articleID . ", '" . $client_form_data['articleText'] . "', '" . $client_form_data['LangID'] . "');";
 		$mysqli->query($db_str);
 
 		// Article instance ID is 1 because a new text box can only have 1 instance
 		$db_str = "INSERT INTO BookPageArticles (BookPageID, BookArticleID, BookPageArticleInstanceNum,
 					BookPageArticleIpadOrientation, BookPageArticleXCoord, BookPageArticleYCoord, BookPageArticleWidth,
 					BookPageArticleHeight, BookPageArticleStackOrder)
-					VALUES (" . $_REQUEST['pageID'] . ", " . $articleID . ", 1,
-					'" . $_REQUEST['orientation'] . "', " . $_REQUEST['Xcoord'] . ", " . $_REQUEST['Ycoord'] . ",
-					" . $_REQUEST['width'] . ", " . $_REQUEST['height'] . ", 1);";
+					VALUES (" . $client_form_data['pageID'] . ", " . $articleID . ", 1,
+					'" . $client_form_data['orientation'] . "', " . $client_form_data['Xcoord'] . ", " . $client_form_data['Ycoord'] . ",
+					" . $client_form_data['width'] . ", " . $client_form_data['height'] . ", 1);";
 		$mysqli->query($db_str);
 		$articleInstanceID = $mysqli->insert_id;
 	}	
-	else if ($_REQUEST['mode'] == "add_instance")
+	else if ($client_form_data['mode'] == "add_instance")
 	{
 		$db_str = "INSERT INTO BookPageArticles (BookPageID, BookArticleID, BookPageArticleInstanceNum,
 					BookPageArticleIpadOrientation, BookPageArticleXCoord, BookPageArticleYCoord, BookPageArticleWidth,
 					BookPageArticleHeight, BookPageArticleStackOrder)
-					VALUES (" . $_REQUEST['pageID'] . ", " . $articleID . ", " . $articleInstanceID . ",
-					'" . $_REQUEST['orientation'] . "', " . $_REQUEST['Xcoord'] . ", " . $_REQUEST['Ycoord'] . ",
-					" . $_REQUEST['width'] . ", " . $_REQUEST['height'] . ", 1);";
+					VALUES (" . $client_form_data['pageID'] . ", " . $articleID . ", " . $articleInstanceID . ",
+					'" . $client_form_data['orientation'] . "', " . $client_form_data['Xcoord'] . ", " . $client_form_data['Ycoord'] . ",
+					" . $client_form_data['width'] . ", " . $client_form_data['height'] . ", 1);";
 		$mysqli->query($db_str);
 	}
 
@@ -103,24 +104,24 @@
 	$ArticleData = "";
 	if ($is_shared_instance)
 	{
-		$ArticleData = "Article:mode=" . $_REQUEST['mode'] . "&loggingIn=false" . $item_delimiter
-					. "ID=" . $articleID . "&text=" . $_REQUEST['articleText']
+		$ArticleData = "Article:mode=" . $client_form_data['mode'] . "&loggingIn=false" . $item_delimiter
+					. "ID=" . $articleID . "&text=" . $client_form_data['articleText']
 					. "&isShared=false";
 	}
 
-	$ArticleInstanceData = "ArticleInstance:mode=" . $_REQUEST['mode'] . "&loggingIn=false" . $item_delimiter
+	$ArticleInstanceData = "ArticleInstance:mode=" . $client_form_data['mode'] . "&loggingIn=false" . $item_delimiter
 						. "ID=" . $articleID . "&instanceID=" . $articleInstanceID
-						. "&pageID=" . $_REQUEST['pageID'] . "&orientation=" . $_REQUEST['orientation']
-						. "&Xcoord=" . $_REQUEST['Xcoord'] . "&Ycoord=" . $_REQUEST['Ycoord']
-						. "&width=" . $_REQUEST['width'] . "&height=" . $_REQUEST['height'];
+						. "&pageID=" . $client_form_data['pageID'] . "&orientation=" . $client_form_data['orientation']
+						. "&Xcoord=" . $client_form_data['Xcoord'] . "&Ycoord=" . $client_form_data['Ycoord']
+						. "&width=" . $client_form_data['width'] . "&height=" . $client_form_data['height'];
 	if (!empty($ArticleData))
 		echo $ArticleData . $data_delimiter;
 	echo $ArticleInstanceData;
 /*	
-	echo "Article:mode=" . $_REQUEST['mode'] . "&loggingIn=false" . $item_delimiter . "&pageID=" . $_REQUEST['pageID'] ."&ID=" . $articleID
+	echo "Article:mode=" . $client_form_data['mode'] . "&loggingIn=false" . $item_delimiter . "&pageID=" . $client_form_data['pageID'] ."&ID=" . $articleID
 		. "&instanceID=" . $articleInstanceID
-		. "&orientation=" . $_REQUEST['orientation'] . "&Xcoord=" . $_REQUEST['Xcoord'] . "&Ycoord=" . $_REQUEST['Ycoord']
-		. "&width=" . $_REQUEST['width'] . "&height=" . $_REQUEST['height'] . "&text=". $_REQUEST['articleText'];
+		. "&orientation=" . $client_form_data['orientation'] . "&Xcoord=" . $client_form_data['Xcoord'] . "&Ycoord=" . $client_form_data['Ycoord']
+		. "&width=" . $client_form_data['width'] . "&height=" . $client_form_data['height'] . "&text=". $client_form_data['articleText'];
 */
 	//echo $db_str;
 ?>

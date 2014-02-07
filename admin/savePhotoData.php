@@ -3,12 +3,10 @@
 	include("../_sharedIncludes/dbconnect.php");
 	include("../_sharedIncludes/globals.php");
 	
-	//echo $_REQUEST;
-	//print_r($_REQUEST['Ycoord']);
-	//exit(0);
+	$client_form_data = json_decode(file_get_contents('php://input'), true);
 	$PhotoData = "";
 	$photoInstanceID = "";
-	if ($_REQUEST['mode'] == "publishBook")
+	if ($client_form_data['mode'] == "publishBook")
 	{
 		// Page photo population **********************************
 		$pix_str = "SELECT BookPagePhotoID, BookPhotoURL, BookPageID, BookPagePhotoInstanceNum,
@@ -18,7 +16,7 @@
 					INNER JOIN BookPagePhotos BPP
 						ON BP.BookPhotoID = BPP.BookPhotoID
 					WHERE BookLoginUsername = '" . $_SESSION['BookLoginUsername'] . "'
-						AND BookID = " . $_REQUEST['bookID'] . "
+						AND BookID = " . $client_form_data['bookID'] . "
 						AND BookPagePhotoIpadOrientation != 'outside';";
 		$images_sql = $mysqli->query($pix_str);
 		while ($row = $images_sql->fetch_assoc())
@@ -51,22 +49,22 @@
 		echo "Published!";
 		exit(0);
 	}
-	else if ($_REQUEST['mode'] == "delete")
+	else if ($client_form_data['mode'] == "delete")
 	{
-		if (!empty($_REQUEST['instanceID']))
+		if (!empty($client_form_data['instanceID']))
 		{
 			$db_str = "DELETE FROM BookPagePhotos
-						WHERE BookPhotoID = " . $_REQUEST['ID'] . "
-						AND BookPagePhotoInstanceNum = " . $_REQUEST['instanceID'] . ";";
+						WHERE BookPhotoID = " . $client_form_data['ID'] . "
+						AND BookPagePhotoInstanceNum = " . $client_form_data['instanceID'] . ";";
 			$mysqli->query($db_str);
-			echo "Deleted:PhotoInstance," . $_REQUEST['ID'] . "," . $_REQUEST['instanceID'] . "," . $_REQUEST['pageID'];
+			echo "Deleted:PhotoInstance," . $client_form_data['ID'] . "," . $client_form_data['instanceID'] . "," . $client_form_data['pageID'];
 			exit(0);
 		}
 		else
 		{
 			$are_there_photo_instances_str = "SELECT BookPagePhotoID
 											FROM BookPagePhotos
-											WHERE BookPhotoID = " . $_REQUEST['ID'] . ";";
+											WHERE BookPhotoID = " . $client_form_data['ID'] . ";";
 			$stmt = $mysqli->prepare($are_there_photo_instances_str);
 			$stmt->execute();
 			$stmt->store_result();
@@ -81,7 +79,7 @@
 			{
 				$db_str = "SELECT BookPhotoURL
 							FROM BookPhotos
-							WHERE BookPhotoID = " . $_REQUEST['ID'] . ";";
+							WHERE BookPhotoID = " . $client_form_data['ID'] . ";";
 						
 				$file_sql = $mysqli->query($db_str);
 				$row = $file_sql->fetch_assoc();
@@ -99,14 +97,14 @@
 					unlink($small_filename);
 				$db_str = "DELETE
 							FROM BookPhotos
-							WHERE BookPhotoID = " . $_REQUEST['ID'] . ";";
+							WHERE BookPhotoID = " . $client_form_data['ID'] . ";";
 				$mysqli->query($db_str);
-				echo "Deleted:Photo," . $_REQUEST['ID'];
+				echo "Deleted:Photo," . $client_form_data['ID'];
 				exit(0);
 			}
 		}
 	}
-	else if ($_REQUEST['mode'] == "add")
+	else if ($client_form_data['mode'] == "add")
 	{
 		/****************************************
 			We now pass stack order from client
@@ -116,8 +114,8 @@
 		$stackOrder = 0;	
 		$stack_order_str = "SELECT IFNULL(MAX(BookPagePhotoStackOrder), 0) as MaxStackOrder
 					FROM BookPagePhotos
-					WHERE BookPageID = " . $_REQUEST['pageID'] . "
-						AND BookPagePhotoIpadOrientation = '" . $_REQUEST['orientation'] . "';";
+					WHERE BookPageID = " . $client_form_data['pageID'] . "
+						AND BookPagePhotoIpadOrientation = '" . $client_form_data['orientation'] . "';";
 		$stack_order_sql = $mysqli->query($stack_order_str);
 		if (!$stack_order_sql)
 			echo "no results";
@@ -133,7 +131,7 @@
 		// Get instance number for photo ********************************
 		$next_instance_str = "SELECT IFNULL(MAX(BookPagePhotoInstanceNum), 0) as MaxInstanceNum
 					FROM BookPagePhotos
-					WHERE BookPhotoID = " . $_REQUEST['ID'] . ";";
+					WHERE BookPhotoID = " . $client_form_data['ID'] . ";";
 		$next_instance_sql = $mysqli->query($next_instance_str);
 		if (!$next_instance_sql)
 			echo "no results";
@@ -148,12 +146,12 @@
 		$db_str = "INSERT INTO BookPagePhotos (BookPageID, BookPhotoID, BookPagePhotoInstanceNum,
 			BookPagePhotoIpadOrientation, BookPagePhotoXCoord, BookPagePhotoYCoord,
 			BookPagePhotoWidth, BookPagePhotoHeight, BookPagePhotoStretchToFill, BookPagePhotoStackOrder)
-			VALUES (" . $_REQUEST['pageID'] . ", " . $_REQUEST['ID'] . ", " . $photoInstanceID . ", 
-			'" . $_REQUEST['orientation'] . "', " . $_REQUEST['Xcoord'] . ", " . $_REQUEST['Ycoord'] . ", "
-				. $_REQUEST['width'] . ", " . $_REQUEST['height'] . ", "
-				. $_REQUEST['stretchToFill'] . ", " . $_REQUEST['stackOrder'] . ");";
+			VALUES (" . $client_form_data['pageID'] . ", " . $client_form_data['ID'] . ", " . $photoInstanceID . ", 
+			'" . $client_form_data['orientation'] . "', " . $client_form_data['Xcoord'] . ", " . $client_form_data['Ycoord'] . ", "
+				. $client_form_data['width'] . ", " . $client_form_data['height'] . ", "
+				. $client_form_data['stretchToFill'] . ", " . $client_form_data['stackOrder'] . ");";
 	}
-	else if ($_REQUEST['mode'] == "update")
+	else if ($client_form_data['mode'] == "update")
 	{
 		/*
 		$query  = explode('&', $_SERVER['QUERY_STRING']);
@@ -165,30 +163,30 @@
 			$params[urldecode($name)][] = urldecode($value);
 		}
 		*/
-		$photoInstanceID = $_REQUEST['instanceID'];
+		$photoInstanceID = $client_form_data['instanceID'];
 		// Update photos in DB ********************************
 		$db_str = "UPDATE BookPagePhotos
 					SET BookPagePhotoInstanceNum = " . $photoInstanceID;
-					if (isset($_REQUEST['orientation']))
-						$db_str .= ", BookPagePhotoIpadOrientation = '" . $_REQUEST['orientation'] . "'";
-					if (isset($_REQUEST['Xcoord']))
-						$db_str .= ", BookPagePhotoXCoord = " . $_REQUEST['Xcoord'];
-					if (isset($_REQUEST['Ycoord']))
-						$db_str .= ", BookPagePhotoYCoord = " . $_REQUEST['Ycoord'];
-					if (isset($_REQUEST['width']))
-						$db_str .= ", BookPagePhotoWidth = " . $_REQUEST['width'];
-					if (isset($_REQUEST['height']))
-						$db_str .= ", BookPagePhotoHeight = " . $_REQUEST['height'];
-					if (isset($_REQUEST['stretchToFill']))
-						$db_str .= ", BookPagePhotoStretchToFill = " . $_REQUEST['stretchToFill'];
-					$db_str .= " WHERE BookPhotoID = " . $_REQUEST['ID'] . "
+					if (isset($client_form_data['orientation']))
+						$db_str .= ", BookPagePhotoIpadOrientation = '" . $client_form_data['orientation'] . "'";
+					if (isset($client_form_data['Xcoord']))
+						$db_str .= ", BookPagePhotoXCoord = " . $client_form_data['Xcoord'];
+					if (isset($client_form_data['Ycoord']))
+						$db_str .= ", BookPagePhotoYCoord = " . $client_form_data['Ycoord'];
+					if (isset($client_form_data['width']))
+						$db_str .= ", BookPagePhotoWidth = " . $client_form_data['width'];
+					if (isset($client_form_data['height']))
+						$db_str .= ", BookPagePhotoHeight = " . $client_form_data['height'];
+					if (isset($client_form_data['stretchToFill']))
+						$db_str .= ", BookPagePhotoStretchToFill = " . $client_form_data['stretchToFill'];
+					$db_str .= " WHERE BookPhotoID = " . $client_form_data['ID'] . "
 					AND BookPagePhotoInstanceNum = " . $photoInstanceID . ";";
 	}
 	if (!empty($db_str))
 		$mysqli->query($db_str);
-	$PhotoData = "PhotoInstance:mode=" . $_REQUEST['mode'] . "&loggingIn=false" . $item_delimiter . "pageID=" . $_REQUEST['pageID']
-		. "&ID=" . $_REQUEST['ID'] . "&instanceID=" . $photoInstanceID
-		. "&orientation=" . $_REQUEST['orientation'] . "&Xcoord=" . $_REQUEST['Xcoord'] . "&Ycoord=" . $_REQUEST['Ycoord']
-		. "&width=" . $_REQUEST['width'] . "&height=" . $_REQUEST['height'] . "&stretchToFill=" . $_REQUEST['stretchToFill'];
+	$PhotoData = "PhotoInstance:mode=" . $client_form_data['mode'] . "&loggingIn=false" . $item_delimiter . "pageID=" . $client_form_data['pageID']
+		. "&ID=" . $client_form_data['ID'] . "&instanceID=" . $photoInstanceID
+		. "&orientation=" . $client_form_data['orientation'] . "&Xcoord=" . $client_form_data['Xcoord'] . "&Ycoord=" . $client_form_data['Ycoord']
+		. "&width=" . $client_form_data['width'] . "&height=" . $client_form_data['height'] . "&stretchToFill=" . $client_form_data['stretchToFill'];
 	echo $PhotoData;
 ?>

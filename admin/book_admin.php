@@ -50,6 +50,20 @@
 	var g_imageWebLocationUser = "<?=$g_image_web_location_user?>";
 	var g_systemImageWebLocation = "<?=$g_system_image_web_location?>";
 
+
+	function escapeJSON(str)
+	{
+		return (str.replace(/[\\]/g, '\\\\')
+			.replace(/[\"]/g, '\\\"')
+			.replace(/[\/]/g, '\\/')
+			.replace(/[\b]/g, '\\b')
+			.replace(/[\f]/g, '\\f')
+			.replace(/[\n]/g, '\\n')
+			.replace(/[\r]/g, '\\r')
+			.replace(/[\t]/g, '\\t')
+		);
+	}
+
 	function p_getScrollbarWidth()
 	{
 		var div, body, W = window.browserScrollbarWidth;
@@ -63,7 +77,7 @@
 			body.removeChild(div);
 		}
 		return W;
-	};
+	}
 	
 	function roundToDecimalPoint(data, numberOfPoints)
 	{

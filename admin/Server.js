@@ -15,12 +15,14 @@
 		{
 			//"ArticleInstances"
 			var dataString;
+			var dataObj = {};
 			if (dataRequested)
-				dataString = "load" + dataRequested + "=true";
+				dataString = "load" + dataRequested;
 			else
-				dataString = "loadAllData=true";
-			dataString += "&UserLogin=" + g_userLogin + "&BookID=" + g_bookID + "&BookLang=" + g_defaultLangID;
-			this.saveDataOnServer(dataString, g_loadDataAjaxPage);
+				dataString = "loadAllData";
+			dataObj = {UserLogin: g_userLogin, BookID: g_bookID, BookLang: g_defaultLangID};
+			dataObj[dataString] = "true";
+			this.saveDataOnServer(dataObj, g_loadDataAjaxPage);
 		}
 		
 		this.saveStackOrder = function(pageID)
@@ -86,6 +88,13 @@
 			var height = (parseInt($(UIelement).height()) * g_backwardsResizeByFactor);
 			var divID = $(UIelement).attr("id");
 			var dataPageName;
+			var dataObj = {};
+			dataObj['pageID'] = pageID;
+			dataObj['orientation'] = orientation;
+			dataObj['Xcoord'] = Xcoord;
+			dataObj['Ycoord'] = Ycoord;
+			dataObj['width'] = width;
+			dataObj['height'] = height;
 			if (AdminManager.isPhotoObj(objectType))
 			{
 				var photoID = AdminPhotoManager.getPhotoIDfromDivID(divID);
@@ -97,17 +106,18 @@
 					photoInstanceID = AdminPhotoManager.getPhotoInstanceIDfromDivID(divID);
 					photoInstance = AdminPhotoManager.getPhotoInstance(photoID, photoInstanceID);
 				}
-				var stretchToFill = false;
+				var stretchToFill = "false";
 				var stackOrder = PageManager.pages[PageManager.getCurrentPageID()].photos.length + 1;
 				if (photoInstance)
 				{
-					stretchToFill = photoInstance.stretchToFill;
+					stretchToFill = photoInstance.stretchToFill ? "true" : "false";
 					stackOrder = AdminManager.getStackOrder(photoID, photoInstanceID, g_photoObjectType);
 				}
 				var mode = (AdminPhotoManager.isDraggedPhoto(divID) ? "add" : "update");
-				var dataToSend = "mode=" + mode + "&pageID=" + pageID + "&ID=" + photoID + "&instanceID=" + photoInstanceID
-					+ "&orientation=" + orientation + "&Xcoord=" + Xcoord + "&Ycoord=" + Ycoord
-					+ "&width=" + width + "&height=" + height + "&stretchToFill=" + stretchToFill;
+				dataObj['mode'] = mode;
+				dataObj['ID'] = photoID;
+				dataObj['instanceID'] = photoInstanceID;
+				dataObj['stretchToFill'] = stretchToFill;
 				dataPageName = g_photoAjaxPage;
 			}
 			else if (AdminManager.isArticleObj(objectType))
@@ -134,13 +144,16 @@
 						stackOrder = AdminManager.getStackOrder(articleID, articleInstanceID, g_articleObjectType);
 					}
 				}
-				var dataToSend = "mode=" + mode + "&ID=" + articleID + "&instanceID=" + articleInstanceID + "&pageID=" + pageID
-					+ "&orientation=" + orientation + "&articleText=" + $(UIelement).html() + "&Xcoord=" + Xcoord
-					+ "&Ycoord=" + Ycoord + "&width=" + width + "&height=" + height + "&BookID=" + g_bookID + "&LangID=" + g_defaultLangID;
+				dataObj['mode'] = mode;
+				dataObj['ID'] = articleID;
+				dataObj['instanceID'] = articleInstanceID;
+				dataObj['BookID'] = g_bookID;
+				dataObj['LangID'] = g_defaultLangID;
+				dataObj['articleText'] = $(UIelement).html();
 				dataPageName = g_articleAjaxPage;
 			}
 			if (dataPageName)
-				this.saveDataOnServer(dataToSend, dataPageName);
+				this.saveDataOnServer(dataObj, dataPageName);
 		}
 	
 
@@ -163,8 +176,9 @@
 			$.ajax({
 				type : "POST",
 				url : page,
-				data: dataToSend,
-				dataType : "html", // data type to be returned
+				data: JSON.stringify(dataToSend),
+				dataType : "json", // data type to be returned
+				contentType: "application/json",
 				success: function(data) {
 					//alert( data ); // shows whole dom
 					Communicator.showDataFromServer( data );
@@ -188,7 +202,13 @@
 					else
 						ErrString += 'Uncaught Error.\n' + jqXHR.responseText;
 					mydebug(ErrString, true, true);
-					alert(ErrString);
+					mydebug(jqXHR.status, false, true);
+					mydebug(jqXHR.responseText, false, true);
+					mydebug(exception, false, true);
+					//alert(ErrString);
+					//for (var x in jqXHR)
+						//mydebug(x + ":" + jqXHR[x], false, true);
+						//alert(x + ":" + jqXHR[x]);
 				}
 			});
 		}
@@ -196,16 +216,18 @@
 		this.showDataFromServer = function(serverdata)
 		{
 			var data;
-			var allDataSetsArray = serverdata.split(g_dataDelimeter);
-			var mode, loggingIn;
-			for (var z = 0; z < allDataSetsArray.length; z++)
+			var dataObj = serverdata;
+			var allDataSetsObj = dataObj["allData"];
+			var globalVarsObj = allDataSetsObj["globals"];
+			var isAddingMode = (("mode" in globalVarsObj) && globalVarsObj['mode'] == "add");
+			var loggingIn = (("loggingIn" in globalVarsObj) && globalVarsObj['loggingIn'] == "true");
+			for (var datasetName in allDataSetsObj)
 			{
-				data = allDataSetsArray[z];
-				if (data.substring(0, 6) == "Error:")
-					alert("Error is: " + data.substring(6));
-				else if (data.substring(0, 9) == "Published")
+				if (datasetName == "error")
+					alert("Error is: " + allDataSetsObj[datasetName]);
+				else if (datasetName == "published")
 					alert("Your book was published!");
-				else if (data.substring(0, 8) == "Deleted:")
+				else if (datasetName == "deleted")
 				{
 					var IDarray = data.substring(8).split(",");
 					if (IDarray[0].substring(0, 5) == "Photo")
@@ -232,125 +254,53 @@
 					}
 					g_objectClicked = null;
 				}
-				else if (data.substring(0, 5) == "Page:")
+				else if (datasetName == "pages")
 				{
-					data = data.substring(5);
-					var dataHash = {};
-					var dataArray = data.split("&");
-					var dataTempArray = new Array();
-					var allDataArray = data.split(g_itemDelimeter);
+					var allDataArray = allDataSetsObj[datasetName];
 					for (var y = 0; y < allDataArray.length; y++)
 					{
-						data = allDataArray[y];
-						dataArray = data.split("&");
-						for (var x = 0; x < dataArray.length; x++)
-						{
-							dataTempArray = dataArray[x].split("=");
-							dataHash[dataTempArray[0]] = dataTempArray[1];
-						}
-						if (y == 0)
-						{
-							mode = dataHash['mode'];
-							loggingIn = (dataHash['loggingIn'] == "true");
-							continue;
-						}
+						dataHash = allDataArray[y];
 						PageManager.addPage(dataHash["bookID"], dataHash['pageID'], dataHash['pageNum']);
 					}
 				}
-				else if (data.substring(0, 6) == "Photo:")
+				else if (datasetName == "photos")
 				{
-					data = data.substring(6);
-					var dataHash = {};
-					var dataArray = data.split("&");
-					var dataTempArray = new Array();
-					var allDataArray = data.split(g_itemDelimeter);
+					var allDataArray = allDataSetsObj[datasetName];
 					for (var y = 0; y < allDataArray.length; y++)
 					{
-						data = allDataArray[y];
-						dataArray = data.split("&");
-						for (var x = 0; x < dataArray.length; x++)
-						{
-							dataTempArray = dataArray[x].split("=");
-							dataHash[dataTempArray[0]] = dataTempArray[1];
-						}
-						if (y == 0)
-						{
-							mode = dataHash['mode'];
-							loggingIn = (dataHash['loggingIn'] == "true");
-							continue;
-						}
+						dataHash = allDataArray[y];
 						AdminPhotoManager.addPhoto(dataHash['ID'], dataHash['photoURL'], dataHash['width'], dataHash['height'],
 							dataHash['widthSmall'], dataHash['heightSmall']);
 						addJQueryEvents("#" + AdminPhotoManager.getPhotoWrapperDivID(dataHash['ID']));
 					}
 				}
-				else if (data.substring(0, 8) == "Article:")
+				else if (datasetName == "articles")
 				{
-					data = data.substring(8);
-					var dataHash = {};
-					var dataArray = data.split("&");
-					var dataTempArray = new Array();
-					var textTempArray = new Array();
-					var allDataArray = data.split(g_itemDelimeter);
+					var allDataArray = allDataSetsObj[datasetName];
 					for (var y = 0; y < allDataArray.length; y++)
 					{
-						data = allDataArray[y];
-						dataArray = data.split("&");
-						for (var x = 0; x < dataArray.length; x++)
-						{
-							dataTempArray = dataArray[x].split("=");
-							dataHash[dataTempArray[0]] = dataTempArray[1];
-						}
-						if (y == 0)
-						{
-							mode = dataHash['mode'];
-							loggingIn = (dataHash['loggingIn'] == "true");
-							continue;
-						}
+						dataHash = allDataArray[y];
 						var re = new RegExp(g_textDelimeterReplaceAmperstand, 'g');
 						dataHash['text'] = dataHash['text'].replace(re, "&");
-						//dataHash['text'] = dataHash['text'].replace(/%26amp%3B/g,"&");
-						//textTempArray = dataHash['text'].split(g_textDelimeterReplaceAmperstand);
-						//dataHash['text'] = textTempArray.join("&");
-						//alert(dataHash['text']); //.replace(/%26amp%3B/g,"&")
-						if (dataHash['mode'] == "add")
+						if (("mode" in dataHash) && dataHash['mode'] == "add")
 							AdminArticleManager.removeTempTextBoxIfExists();
 						AdminArticleManager.addUpdateArticle(dataHash['ID'], dataHash['title'],
 							dataHash['author'], dataHash['text'], (dataHash['isShared'] == "1"));
-						//AdminArticleManager.addUpdateArticleInstance(dataHash['ID'], dataHash['instanceID'],
-						//	dataHash['pageID'], dataHash['orientation'], dataHash['Xcoord'], dataHash['Ycoord'], dataHash['width'], dataHash['height'],
-						//	(mode.substring(0, 3) == "add"), false);
 					}
 				}
-				else if (data.substring(0, 14) == "PhotoInstance:")
+				else if (datasetName == "photoinstances")
 				{
-					data = data.substring(14);
-					var dataHash = {}, dataArray, dataTempArray = new Array();
-					var allDataArray = data.split(g_itemDelimeter);
-					var isNewPhoto;
+					var allDataArray = allDataSetsObj[datasetName];
+					var isNewPhoto, loggingIn;
 					for (var y = 0; y < allDataArray.length; y++)
 					{
-						data = allDataArray[y];
-						dataArray = data.split("&");
-						for (var x = 0; x < dataArray.length; x++)
-						{
-							dataTempArray = dataArray[x].split("=");
-							dataHash[dataTempArray[0]] = dataTempArray[1];
-						}
-						if (y == 0)
-						{
-							mode = dataHash['mode'];
-							loggingIn = (dataHash['loggingIn'] == "true");
-							isNewPhoto = (mode == "add")
-							continue;
-						}
+						dataHash = allDataArray[y];
 						AdminPhotoManager.addUpdatePhotoInstance(dataHash['ID'], dataHash['instanceID'], dataHash['pageID'],
 							dataHash['Xcoord'], dataHash['Ycoord'], dataHash['width'], dataHash['height'],
-							dataHash['stretchToFill'], dataHash['orientation'], isNewPhoto, loggingIn);
+							dataHash['stretchToFill'], dataHash['orientation'], isAddingMode, loggingIn);
 						var photoInstanceWrapperDivID = AdminPhotoManager.getPhotoInstanceWrapperDivID(dataHash['ID'], dataHash['instanceID']);
 						var photoInstanceDivID = AdminPhotoManager.getPhotoInstanceDivID(dataHash['ID'], dataHash['instanceID']);
-						//StackOrderManager.setPhotoStackOrderInsideIpad(photoInstanceWrapperDivID, dataHash['photoID'], dataHash['photoInstanceID']);
-						if (isNewPhoto)
+						if (isAddingMode)
 						{
 							// Doing this due to JQuery bug
 							//
@@ -366,49 +316,24 @@
 						}
 					}
 				}
-				else if (data.substring(0, 16) == "ArticleInstance:")
+				else if (datasetName == "articlesinstances")
 				{
-					data = data.substring(16);
-					var dataHash = {}, dataArray, dataTempArray = new Array();
-					var allDataArray = data.split(g_itemDelimeter);
-					var loggingIn;
+					var allDataArray = allDataSetsObj[datasetName];
+					var mode, isNewArticleInstance, loggingIn;
 					for (var y = 0; y < allDataArray.length; y++)
 					{
-						data = allDataArray[y];
-						dataArray = data.split("&");
-						for (var x = 0; x < dataArray.length; x++)
-						{
-							dataTempArray = dataArray[x].split("=");
-							dataHash[dataTempArray[0]] = dataTempArray[1];
-						}
-						if (y == 0)
-						{
-							mode = dataHash['mode'];
-							loggingIn = (dataHash['loggingIn'] == "true");
-							continue;
-						}
-						var isNewArticleInstance = (mode == "add");
+						dataHash = allDataArray[y];
 						AdminArticleManager.addUpdateArticleInstance(dataHash['ID'], dataHash['instanceID'], dataHash['pageID'],
 							dataHash['orientation'], dataHash['Xcoord'], dataHash['Ycoord'],
-							dataHash['width'], dataHash['height'], isNewArticleInstance, loggingIn);
+							dataHash['width'], dataHash['height'], isAddingMode, loggingIn);
 					}
 				}
-				else if (data.substring(0, 11) == "StackOrder:")
+				else if (datasetName == "stackorder")
 				{
-					data = data.substring(11);
-					var dataHash = {}, dataArray, dataTempArray = new Array();
-					var allDataArray = data.split(g_itemDelimeter);
+					var allDataArray = allDataSetsObj[datasetName];
 					for (var y = 0; y < allDataArray.length; y++)
 					{
-						data = allDataArray[y];
-						dataArray = data.split("&");
-						for (var x = 0; x < dataArray.length; x++)
-						{
-							dataTempArray = dataArray[x].split("=");
-							dataHash[dataTempArray[0]] = dataTempArray[1];
-						}
-						if (y == 0)
-							continue;
+						dataHash = allDataArray[y];
 						StackOrderManager.updateStackOrder(dataHash['ID'], dataHash['instanceID'], dataHash['pageID'],
 							dataHash['objectType'], dataHash['orientation'], dataHash['stackOrder']);
 					}
