@@ -4,7 +4,6 @@
 	include("../_sharedIncludes/globals.php");
 	
 	$client_form_data = json_decode(file_get_contents('php://input'), true);
-	$PhotoData = "";
 	$photoInstanceID = "";
 	if ($client_form_data['mode'] == "publishBook")
 	{
@@ -106,26 +105,6 @@
 	}
 	else if ($client_form_data['mode'] == "add")
 	{
-		/****************************************
-			We now pass stack order from client
-		*****************************************
-
-		// Get stack order number (aka z-index) for photo ********************************
-		$stackOrder = 0;	
-		$stack_order_str = "SELECT IFNULL(MAX(BookPagePhotoStackOrder), 0) as MaxStackOrder
-					FROM BookPagePhotos
-					WHERE BookPageID = " . $client_form_data['pageID'] . "
-						AND BookPagePhotoIpadOrientation = '" . $client_form_data['orientation'] . "';";
-		$stack_order_sql = $mysqli->query($stack_order_str);
-		if (!$stack_order_sql)
-			echo "no results";
-		else
-		{
-			$row = $stack_order_sql->fetch_assoc();
-			$stackOrder = $row['MaxStackOrder'] + 1;
-		}
-		$stack_order_sql->free();
-		*/
 		$photoInstanceID = 0;
 	
 		// Get instance number for photo ********************************
@@ -153,16 +132,6 @@
 	}
 	else if ($client_form_data['mode'] == "update")
 	{
-		/*
-		$query  = explode('&', $_SERVER['QUERY_STRING']);
-		$params = array();
-
-		foreach( $query as $param )
-		{
-			list($name, $value) = explode('=', $param);
-			$params[urldecode($name)][] = urldecode($value);
-		}
-		*/
 		$photoInstanceID = $client_form_data['instanceID'];
 		// Update photos in DB ********************************
 		$db_str = "UPDATE BookPagePhotos
@@ -184,9 +153,17 @@
 	}
 	if (!empty($db_str))
 		$mysqli->query($db_str);
-	$PhotoData = "PhotoInstance:mode=" . $client_form_data['mode'] . "&loggingIn=false" . $item_delimiter . "pageID=" . $client_form_data['pageID']
-		. "&ID=" . $client_form_data['ID'] . "&instanceID=" . $photoInstanceID
-		. "&orientation=" . $client_form_data['orientation'] . "&Xcoord=" . $client_form_data['Xcoord'] . "&Ycoord=" . $client_form_data['Ycoord']
-		. "&width=" . $client_form_data['width'] . "&height=" . $client_form_data['height'] . "&stretchToFill=" . $client_form_data['stretchToFill'];
-	echo $PhotoData;
+	$allDataArray = array();
+	$allDataArray["globals"] = array("loggingIn" => "false", "mode" => $client_form_data['mode']);
+	$allDataArray["photoinstances"] = array("ID" => $client_form_data['ID'],
+		"instanceID" => $photoInstanceID,
+		"pageID" => $client_form_data['pageID'],
+		"orientation" => $client_form_data['orientation'],
+		"Xcoord" => $client_form_data['Xcoord'],
+		"Ycoord" => $client_form_data['Ycoord'],
+		"width" => $client_form_data['width'],
+		"height" => $client_form_data['height'],
+		"stretchToFill" => $client_form_data['stretchToFill']
+	);
+	echo json_encode(array("allData" => $allDataArray));
 ?>

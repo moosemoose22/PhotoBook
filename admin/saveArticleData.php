@@ -101,27 +101,29 @@
 	}
 
 
-	$ArticleData = "";
+	$allDataArray = array();
+	$allDataArray["globals"] = array("loggingIn" => "false", "mode" => $client_form_data['mode']);
+
 	if ($is_shared_instance)
 	{
-		$ArticleData = "Article:mode=" . $client_form_data['mode'] . "&loggingIn=false" . $item_delimiter
-					. "ID=" . $articleID . "&text=" . $client_form_data['articleText']
-					. "&isShared=false";
+		$allDataArray["articles"] =
+			array("ID" => $articleID,
+					"title" => $row['BookArticleLangTitle'],
+					"author" => $row['BookArticleLangAuthor'],
+					"text" => $client_form_data['articleText'],
+					"isShared" => $is_shared_instance
+				);
 	}
 
-	$ArticleInstanceData = "ArticleInstance:mode=" . $client_form_data['mode'] . "&loggingIn=false" . $item_delimiter
-						. "ID=" . $articleID . "&instanceID=" . $articleInstanceID
-						. "&pageID=" . $client_form_data['pageID'] . "&orientation=" . $client_form_data['orientation']
-						. "&Xcoord=" . $client_form_data['Xcoord'] . "&Ycoord=" . $client_form_data['Ycoord']
-						. "&width=" . $client_form_data['width'] . "&height=" . $client_form_data['height'];
-	if (!empty($ArticleData))
-		echo $ArticleData . $data_delimiter;
-	echo $ArticleInstanceData;
-/*	
-	echo "Article:mode=" . $client_form_data['mode'] . "&loggingIn=false" . $item_delimiter . "&pageID=" . $client_form_data['pageID'] ."&ID=" . $articleID
-		. "&instanceID=" . $articleInstanceID
-		. "&orientation=" . $client_form_data['orientation'] . "&Xcoord=" . $client_form_data['Xcoord'] . "&Ycoord=" . $client_form_data['Ycoord']
-		. "&width=" . $client_form_data['width'] . "&height=" . $client_form_data['height'] . "&text=". $client_form_data['articleText'];
-*/
-	//echo $db_str;
+	$allDataArray["articlesinstances"] =
+		array("ID" => $articleID,
+			"instanceID" => $articleInstanceID,
+			"pageID" => $client_form_data['pageID'],
+			"orientation" => $client_form_data['orientation'],
+			"Xcoord" => $client_form_data['Xcoord'],
+			"Ycoord" => $client_form_data['Ycoord'],
+			"width" => $client_form_data['width'],
+			"height" => $client_form_data['height']
+		);
+	echo json_encode(array("allData" => $allDataArray));
 ?>

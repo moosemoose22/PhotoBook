@@ -64,9 +64,6 @@ function elementCloserToWhichIpad(elementID)
 
 function showRightClickMenu(e)
 {
-	$("#rightclick_menu").show();
-	//$("#rightclick_menu").offset({ top: g_mouseY, left: g_mouseX } );
-	$("#rightclick_menu").offset({ top: 0, left: 0 } );
 	if (AdminManager.isPhotoInstance(e.target.getAttribute("id")))
 	{
 		g_objectClicked = e.target;
@@ -101,6 +98,14 @@ function showRightClickMenu(e)
 		$('.move_menu_option').css('display', 'none');
 		$('.delete_menu_option').css('display', '');
 	}
+	$("#rightclick_menu").show();
+	//$("#rightclick_menu").offset({ top: 0, left: 0 } );
+	var mouseX = g_mouseX, mouseY = g_mouseY;
+	if (($("#rightclick_menu").width() + g_mouseX) > $(window).width())
+		mouseX = $(window).width() - $("#rightclick_menu").width();
+	if (($("#rightclick_menu").height() + g_mouseY) > $(window).height())
+		mouseY = $(window).height() - $("#rightclick_menu").height();
+	$("#rightclick_menu").offset({ top: mouseY, left: mouseX } );
 	if (e.stopPropagation)
 		e.stopPropagation();
 	if (e.preventDefault)

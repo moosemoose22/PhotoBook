@@ -27,11 +27,9 @@
 		
 		this.saveStackOrder = function(pageID)
 		{
-			var dataToSend = "pageID=" + pageID;
-			var parentIDArray = new Array();
-			var instanceIDArray = new Array();
-			var objectTypeArray = new Array();
-			var stackOrderArray = new Array();
+			var dataObj = {};
+			var stackOrderArray = [];
+			dataObj['globals'] = {'pageID': pageID};
 			// if item is outside iPads, we add 100 to stackOrder
 			// client will need this data on the way down
 			var orientationArray = new Array();
@@ -41,17 +39,11 @@
 				if (PageManager.pages[pageID].stackOrderArray[x] != "")
 				{
 					obj = PageManager.pages[pageID].stackOrderArray[x];
-					parentIDArray.push(obj.parentID);
-					instanceIDArray.push(obj.instanceID);
-					objectTypeArray.push(obj.type);
-					stackOrderArray.push(obj.stackOrder);
-					orientationArray.push(obj.ipadOrientation);
+					stackOrderArray.push(obj);
 				}
 			}
-			dataToSend += "&parentID=" + parentIDArray.toString() + "&instanceID=" + instanceIDArray.toString()
-						+ "&objectType=" + objectTypeArray.toString() + "&stackOrder=" + stackOrderArray.toString()
-						+ "&orientation=" + orientationArray.toString();
-			this.saveDataOnServer(dataToSend, g_stackOrderAjaxPage);
+			dataObj['stackorder'] = stackOrderArray;
+			this.saveDataOnServer(dataObj, g_stackOrderAjaxPage);
 		}
 		
 		this.prepareServerMessage = function(UIelement, objectType)
@@ -330,6 +322,7 @@
 				}
 				else if (datasetName == "stackorder")
 				{
+					// Note: we're not using the "new" parameter from the server on updates
 					var allDataArray = allDataSetsObj[datasetName];
 					for (var y = 0; y < allDataArray.length; y++)
 					{
