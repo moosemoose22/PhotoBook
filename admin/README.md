@@ -2,13 +2,10 @@ Photo e-book creation software
 =========
 
 
->This project's goal is to help people design and publish hosted photo e-books.
+>This project's goal is to help people dsign and publish hosted photo e-books.
 >
->There are 2 products here: a product that shows an e-book over the web and a product that allows users to design an e-book.
+>This directory has the files that allows a user to design an e-book.
 
-
-**Front-end page to view e-book**  
-*book2.php--*	The main page of the front end. Required URL values: bookID and pageNum.
 
 **Database description file**  
 *PhotoBook.sql--*	SQL of all tables used in PhotoBook
