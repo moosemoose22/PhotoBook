@@ -1,7 +1,7 @@
 PhotoBook
 =========
 
-##**_Photo e-book creation software_**
+**_Photo e-book creation software_**
 
 This project's goal is to help people dsign and publish hosted photo e-books.
 
@@ -58,5 +58,4 @@ PhotoBook.sql--	SQL of all tables used in PhotoBook
 						This class does all the resizing!  
 
 
-Thanks for taking a look!!!!!
--------------
+**_Thanks for taking a look!!!!!_**
