@@ -1,7 +1,7 @@
 PhotoBook
 =========
 
-**_Photo e-book creation software_**
+##**_Photo e-book creation software_**
 
 This project's goal is to help people dsign and publish hosted photo e-books.
 
@@ -11,9 +11,9 @@ book2.php--	The main page of the front end. Required URL values: bookID and page
 
 PhotoBook.sql--	SQL of all tables used in PhotoBook
 
-**Admin directory main files:**
-book_admin.php--	Main admin page
-DataStructures.js--	Data structures used by admin
+**Admin directory main files:**  
+book_admin.php--	Main admin page  
+DataStructures.js--	Data structures used by admin  
 	Main data structures: PageManager, AdminManager, AdminArticleManager, AdminPhotoManager, StackOrderManager, ImageSourceManager, Logger
 MouseEvents.js--	Document DOM event functions such as MouseUp, MouseDown, onBlur, etc.
 	Main data structures: DocumentClickManager
