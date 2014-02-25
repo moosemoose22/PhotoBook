@@ -1,7 +1,7 @@
 PhotoBook
 =========
 
-Photo e-book creation software
+*Photo e-book creation software*
 
 This project's goal is to help people dsign and publish hosted photo e-books.
 
@@ -40,8 +40,8 @@ SimpleImage.php--		Contains PHP class that resizes images on upload.
 Admin main server pages:
 saveArticleData.php--	Saves all article/caption data from user.
 						Including:
-						- location of moved article/caption on a page
-						- width/height of article/caption on page (articles can be resized)
+*						- location of moved article/caption on a page
+*						- width/height of article/caption on page (articles can be resized)
 savePhotoData.php--		Saves all photo data from user, including 
 						Including:
 						- location of moved article on a page
