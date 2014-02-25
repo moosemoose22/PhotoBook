@@ -7,9 +7,6 @@ Photo e-book creation software
 >This directory has the files that allows a user to design an e-book.
 
 
-**Database description file**  
-*PhotoBook.sql--*	SQL of all tables used in PhotoBook
-
 **Admin directory main files:**  
 *book_admin.php--*	Main admin page  
 *DataStructures.js--*	Data structures used by admin    
