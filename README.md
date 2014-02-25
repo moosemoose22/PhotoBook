@@ -7,9 +7,9 @@ This project's goal is to help people dsign and publish hosted photo e-books.
 
 There are 2 products here: a product that shows an e-book over the web and a product that allows somebody to design an e-book.
 
-book2.php--	The main page of the front end. Required URL values: bookID and pageNum.
+*book2.php--*	The main page of the front end. Required URL values: bookID and pageNum.
 
-PhotoBook.sql--	SQL of all tables used in PhotoBook
+*PhotoBook.sql--*	SQL of all tables used in PhotoBook
 
 **Admin directory main files:**  
 *book_admin.php--*	Main admin page  
