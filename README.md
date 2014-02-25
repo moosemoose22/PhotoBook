@@ -12,14 +12,14 @@ book2.php--	The main page of the front end. Required URL values: bookID and page
 PhotoBook.sql--	SQL of all tables used in PhotoBook
 
 **Admin directory main files:**  
-book_admin.php--	Main admin page  
-DataStructures.js--	Data structures used by admin    
+*book_admin.php--*	Main admin page  
+*DataStructures.js--*	Data structures used by admin    
 	Main data structures: PageManager, AdminManager, AdminArticleManager, AdminPhotoManager, StackOrderManager, ImageSourceManager, Logger  
-MouseEvents.js--	Document DOM event functions such as MouseUp, MouseDown, onBlur, etc.  
+*MouseEvents.js--*	Document DOM event functions such as MouseUp, MouseDown, onBlur, etc.  
 	Main data structures: DocumentClickManager  
-Server.js--			Main AJAX functionality to connect with server  
+*Server.js--*			Main AJAX functionality to connect with server  
 	Main data structures: Communicator  
-toolbar.inc--		HTML for floating toolbar
+*toolbar.inc--*		HTML for floating toolbar
 
 
 **Admin directory login setup files:**  
@@ -32,9 +32,9 @@ toolbar.inc--		HTML for floating toolbar
 
 
 **Admin photo upload files (Accessed by hitting photo upload button on toolbar):**  
-uploadPix.php--			HTML/JavaScript to upload new photos. Page automatically creates a thumbnail and a medium-sized version.  
-uploadPix_process.php--	PHP page that handles uploading new photos  
-SimpleImage.php--		Contains PHP class that resizes images on upload.
+*uploadPix.php--*			HTML/JavaScript to upload new photos. Page automatically creates a thumbnail and a medium-sized version.  
+*uploadPix_process.php--*	PHP page that handles uploading new photos  
+*SimpleImage.php--*		Contains PHP class that resizes images on upload.
 
 
 **Admin main server pages:**  
@@ -58,4 +58,4 @@ SimpleImage.php--		Contains PHP class that resizes images on upload.
 						This class does all the resizing!  
 
 
-Thanks for taking a look!!!!!
+##*Thanks for taking a look!!!!!*
