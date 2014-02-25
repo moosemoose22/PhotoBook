@@ -41,12 +41,12 @@ Photo e-book creation software
 
 **Admin main server pages:**  
 *saveArticleData.php--*	Saves all article/caption data from user.  
-						Including:  
+						Including:
 *						location of moved article/caption on a page  
 *						width/height of article/caption on page (articles can be resized)
 
 *savePhotoData.php--*		Saves all photo data from user, including  
-						Including:  
+						Including:
 *						location of moved article on a page  
 *						width/height of article on page (articles can be resized)  
 *						code to publish a book!!!!!!
