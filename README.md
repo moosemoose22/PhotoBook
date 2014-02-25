@@ -1,7 +1,5 @@
-PhotoBook
+Photo e-book creation software
 =========
-
-**_Photo e-book creation software_**
 
 
 >This project's goal is to help people dsign and publish hosted photo e-books.
