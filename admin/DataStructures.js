@@ -343,6 +343,53 @@
 		}
 	}
 	
+	var AdminManager = new function()
+	{
+		this.getParentID = function(divID)
+		{
+			var underscore_location = divID.indexOf("_");
+			if (underscore_location == -1)
+				underscore_location = divID.length;
+			return divID.substring(0, underscore_location);
+		}
+		
+		this.isPhotoObj = function(objType)
+		{
+			return objType == g_photoObjectType;
+		}
+		
+		this.isArticleObj = function(objType)
+		{
+			return objType == g_articleObjectType;
+		}
+		
+		this.getStackOrder = function(ID, instanceID, objectType)
+		{
+			var instanceObj;
+			if (this.isPhotoObj(objectType))
+				instanceObj	= AdminPhotoManager.getPhotoInstance(ID, instanceID);
+			else if (this.isArticleObj(objectType))
+				instanceObj	= AdminArticleManager.getArticleInstance(ID, instanceID);
+			if (instanceObj)
+				return instanceObj.stackOrder;
+		}
+		
+		this.isPhotoInstance = function(divID)
+		{
+			return (divID.substring(0, g_photoPrefix.length) == g_photoPrefix);
+		}
+		
+		this.isArticleInstance = function(divID)
+		{
+			return (divID.substring(0, g_articlePrefix.length) == g_articlePrefix);
+		}
+		
+		this.trimDragPrefix = function(divID)
+		{
+			return divID.replace(g_dragPrefix, "");
+		}
+	}
+
 	var AdminArticleManager = new function()
 	{
 		this.articleHash = {};
@@ -551,53 +598,6 @@
 		}
 	}
 	
-	var AdminManager = new function()
-	{
-		this.getParentID = function(divID)
-		{
-			var underscore_location = divID.indexOf("_");
-			if (underscore_location == -1)
-				underscore_location = divID.length;
-			return divID.substring(0, underscore_location);
-		}
-		
-		this.isPhotoObj = function(objType)
-		{
-			return objType == g_photoObjectType;
-		}
-		
-		this.isArticleObj = function(objType)
-		{
-			return objType == g_articleObjectType;
-		}
-		
-		this.getStackOrder = function(ID, instanceID, objectType)
-		{
-			var instanceObj;
-			if (this.isPhotoObj(objectType))
-				instanceObj	= AdminPhotoManager.getPhotoInstance(ID, instanceID);
-			else if (this.isArticleObj(objectType))
-				instanceObj	= AdminArticleManager.getArticleInstance(ID, instanceID);
-			if (instanceObj)
-				return instanceObj.stackOrder;
-		}
-		
-		this.isPhotoInstance = function(divID)
-		{
-			return (divID.substring(0, g_photoPrefix.length) == g_photoPrefix);
-		}
-		
-		this.isArticleInstance = function(divID)
-		{
-			return (divID.substring(0, g_articlePrefix.length) == g_articlePrefix);
-		}
-		
-		this.trimDragPrefix = function(divID)
-		{
-			return divID.replace(g_dragPrefix, "");
-		}
-	}
-
 	var AdminPhotoManager = new function()
 	{
 		this.bookArray = new Array();
