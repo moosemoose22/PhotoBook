@@ -23,9 +23,9 @@ toolbar.inc--		HTML for floating toolbar
 
 
 **Admin directory login setup files:**  
-htaccess--			Makes the default page in admin directory to login.php. Used if you type in /admin and no page is specified.  
+*htaccess*--			Makes the default page in admin directory to login.php. Used if you type in /admin and no page is specified.  
 	NOTE: You need to rename this file to .htaccess (with a preceding period) to use.  
-login.php--			Main login page for admin.  
+*login.php*--			Main login page for admin.  
 checkLogin.php--	Block access to anybody who isn't logged in. Include this file on every page.  
 	NOTE: Maybe should be moved to an _includes directory in admin  
 chooseBook.php--	Forwards a user who logged in to their default book. Puts the book ID into a session variable.
@@ -38,19 +38,22 @@ SimpleImage.php--		Contains PHP class that resizes images on upload.
 
 
 **Admin main server pages:**  
-saveArticleData.php--	Saves all article/caption data from user.  
+*saveArticleData.php*--	Saves all article/caption data from user.  
 						Including:  
 *						location of moved article/caption on a page  
-*						width/height of article/caption on page (articles can be resized)  
-savePhotoData.php--		Saves all photo data from user, including  
+*						width/height of article/caption on page (articles can be resized)
+
+*savePhotoData.php*--		Saves all photo data from user, including  
 						Including:  
 *						location of moved article on a page  
 *						width/height of article on page (articles can be resized)  
-*						code to publish a book!!!!!!  
-saveStackOrder.php--	Save order of photos/articles/captions on page  
+*						code to publish a book!!!!!!
+
+*saveStackOrder.php*--	Save order of photos/articles/captions on page  
 						Every page has to store the order of elements on a page.
-						If 2 elements overlap, it'll know which to show on top.   
-SimpleImage_class.php--	Used by savePhotoData.php to make final resizing for publishing book!  
+						If 2 elements overlap, it'll know which to show on top.
+
+*SimpleImage_class.php*--	Used by savePhotoData.php to make final resizing for publishing book!  
 						When you publish a book, we pre-resize the images. This speeds up the book loading.
 						This class does all the resizing!  
 
