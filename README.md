@@ -40,13 +40,13 @@ SimpleImage.php--		Contains PHP class that resizes images on upload.
 Admin main server pages:
 saveArticleData.php--	Saves all article/caption data from user.
 						Including:
-							location of moved article/caption on a page
-							width/height of article/caption on page (articles can be resized)
+						- location of moved article/caption on a page
+						- width/height of article/caption on page (articles can be resized)
 savePhotoData.php--		Saves all photo data from user, including 
 						Including:
-							location of moved article on a page
-							width/height of article on page (articles can be resized)
-							code to publish a book!!!!!!
+						- location of moved article on a page
+						- width/height of article on page (articles can be resized)
+						- code to publish a book!!!!!!
 saveStackOrder.php--	Save order of photos/articles/captions on page
 						Every page has to store the order of elements on a page.
 						If 2 elements overlap, it'll know which to show on top.
