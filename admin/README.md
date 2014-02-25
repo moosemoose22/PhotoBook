@@ -34,6 +34,13 @@ Photo e-book creation software
 
 
 **Admin main server pages:**  
+*loadAllData.php--*		Loads all data on login.  
+						Including:
+*						all pages in photo book and necessary associated information  
+*						location of articles/captions/photos on a page  
+*						width/height of articles/captions/photos on page (articles can be resized)
+*						ordering of elements on page. Used if elements overlap
+
 *saveArticleData.php--*	Saves all article/caption data from user.  
 						Including:
 *						location of moved article/caption on a page  
