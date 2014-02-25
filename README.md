@@ -58,4 +58,5 @@ PhotoBook.sql--	SQL of all tables used in PhotoBook
 						This class does all the resizing!  
 
 
-##*Thanks for taking a look!!!!!*
+Thanks for taking a look!!!!!
+-------------
