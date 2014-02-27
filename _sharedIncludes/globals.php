@@ -26,4 +26,10 @@
 	{
 		return str_replace(".", "_" . $pageID . "_" . $instanceNum . ".", $URL);
 	}
+	
+	function DBboolean($dataToConvert)
+	{
+		$boolVal = ((bool) $dataToConvert);
+		return ($boolVal ? 1 : 0);
+	}
 ?>

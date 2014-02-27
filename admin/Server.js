@@ -164,7 +164,7 @@
 	
 		this.saveDataOnServer = function(dataToSend, page)
 		{
-			Logger.log(page + ":&nbsp;" + dataToSend, "text", "to_server");
+			Logger.log(page + ":&nbsp;" + JSON.stringify(dataToSend), "text", "to_server");
 			$.ajax({
 				type : "POST",
 				url : page,
@@ -211,8 +211,12 @@
 			var dataObj = serverdata;
 			var allDataSetsObj = dataObj["allData"];
 			var globalVarsObj = allDataSetsObj["globals"];
-			var isAddingMode = (("mode" in globalVarsObj) && globalVarsObj['mode'] == "add");
-			var loggingIn = (("loggingIn" in globalVarsObj) && globalVarsObj['loggingIn'] == "true");
+			var isAddingMode, loggingIn;
+			if (globalVarsObj)
+			{
+				isAddingMode = (("mode" in globalVarsObj) && globalVarsObj['mode'] == "add");
+				loggingIn = (("loggingIn" in globalVarsObj) && globalVarsObj['loggingIn'] == "true");
+			}
 			for (var datasetName in allDataSetsObj)
 			{
 				if (datasetName == "error")

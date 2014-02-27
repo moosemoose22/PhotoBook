@@ -113,7 +113,10 @@
 					WHERE BookPhotoID = " . $client_form_data['ID'] . ";";
 		$next_instance_sql = $mysqli->query($next_instance_str);
 		if (!$next_instance_sql)
-			echo "no results";
+		{
+			echo json_encode(array("allData" => array("error" => "no results")));
+			exit(0);
+		}
 		else
 		{
 			$row = $next_instance_sql->fetch_assoc();
@@ -124,11 +127,11 @@
 		// Insert photo instance into DB ********************************
 		$db_str = "INSERT INTO BookPagePhotos (BookPageID, BookPhotoID, BookPagePhotoInstanceNum,
 			BookPagePhotoIpadOrientation, BookPagePhotoXCoord, BookPagePhotoYCoord,
-			BookPagePhotoWidth, BookPagePhotoHeight, BookPagePhotoStretchToFill, BookPagePhotoStackOrder)
+			BookPagePhotoWidth, BookPagePhotoHeight, BookPagePhotoStretchToFill)
 			VALUES (" . $client_form_data['pageID'] . ", " . $client_form_data['ID'] . ", " . $photoInstanceID . ", 
 			'" . $client_form_data['orientation'] . "', " . $client_form_data['Xcoord'] . ", " . $client_form_data['Ycoord'] . ", "
 				. $client_form_data['width'] . ", " . $client_form_data['height'] . ", "
-				. $client_form_data['stretchToFill'] . ", " . $client_form_data['stackOrder'] . ");";
+				. DBboolean($client_form_data['stretchToFill']) . ");";
 	}
 	else if ($client_form_data['mode'] == "update")
 	{
@@ -155,7 +158,7 @@
 		$mysqli->query($db_str);
 	$allDataArray = array();
 	$allDataArray["globals"] = array("loggingIn" => "false", "mode" => $client_form_data['mode']);
-	$allDataArray["photoinstances"] = array("ID" => $client_form_data['ID'],
+	$allDataArray["photoinstances"] = array(array("ID" => $client_form_data['ID'],
 		"instanceID" => $photoInstanceID,
 		"pageID" => $client_form_data['pageID'],
 		"orientation" => $client_form_data['orientation'],
@@ -164,6 +167,13 @@
 		"width" => $client_form_data['width'],
 		"height" => $client_form_data['height'],
 		"stretchToFill" => $client_form_data['stretchToFill']
-	);
+	));
 	echo json_encode(array("allData" => $allDataArray));
+
+	/*******************************************
+		To see a DB error, just uncomment the lines below
+		and put them earlier in the code. It'll send an alert to the client.
+	*******************************************/
+	//echo json_encode(array("allData" => array("error" => $db_str)));
+	//exit(0);
 ?>

@@ -1018,11 +1018,12 @@
 			if (dataType == "function")
 			{
 				var args_string = "";
-				for(var item in data)
+				//for(var item in data)
+				for (var x = 0, len = data.length; x < len; x++)
 				{
 					if (args_string)
 						args_string += ","
-					args_string += data[item];
+					args_string += data[x];
 				}
 				var myName = data.callee.toString();
 				myName = myName.substr('function '.length);
@@ -1075,6 +1076,6 @@
 				logData = this.p_DataFromServer_Log;
 			else
 				logData = this.p_Log;
-			return "<img src=\"" + g_systemImageWebLocation + "X.jpg\" onclick=\"Logger.closeLog()\" style=\"position:fixed; left:75%\"/>" + logData;
+			return "<img src=\"" + g_systemImageWebLocation + "X.jpg\" onclick=\"Logger.closeLog()\" style=\"position:relative; float: right\"/>" + logData;
 		}
 	}
