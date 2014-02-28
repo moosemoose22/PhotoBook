@@ -38,7 +38,12 @@
 						WHERE BookArticleID = " . $articleID . ";";
 			$mysqli->query($db_str);
 		}
-		echo "Deleted:Article," . $articleID . "," . $articleInstanceID . "," . $client_form_data['pageID'];
+		//echo "Deleted:Article," . $articleID . "," . $articleInstanceID . "," . $client_form_data['pageID'];
+		$deletedHash = array("type" => "articleinstance",
+							"ID" => $articleID,
+							"instanceID" => $articleInstanceID,
+							"pageID" => $client_form_data['pageID']);
+		echo json_encode(array("allData" => array("deleted" => array($deletedHash))));
 		exit(0);
 	}
 	else if ($client_form_data['mode'] == "update")

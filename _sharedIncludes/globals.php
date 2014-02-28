@@ -32,4 +32,9 @@
 		$boolVal = ((bool) $dataToConvert);
 		return ($boolVal ? 1 : 0);
 	}
+	
+	function printErrorMessageToClient($message)
+	{
+		echo json_encode(array("allData" => array("error" => $message)));
+	}
 ?>

@@ -156,9 +156,12 @@
 				pageName = g_photoAjaxPage;
 			else if (AdminManager.isArticleObj(objectType))
 				pageName = g_articleAjaxPage;
-			var data = "mode=delete&ID=" + objectID;
+			var data = {mode:"delete",ID:objectID};
 			if (typeof(objectInstanceID) != "undefined" && objectInstanceID)
-				data += "&instanceID=" + objectInstanceID + "&pageID=" + pageID;
+			{
+				data["instanceID"] = objectInstanceID;
+				data["pageID"] = pageID;
+			}
 			this.saveDataOnServer(data, pageName);
 		}
 	
@@ -225,29 +228,40 @@
 					alert("Your book was published!");
 				else if (datasetName == "deleted")
 				{
-					var IDarray = data.substring(8).split(",");
-					if (IDarray[0].substring(0, 5) == "Photo")
+					var allDataArray = allDataSetsObj[datasetName];
+					var type, ID, instanceID, pageID;
+					for (var y = 0; y < allDataArray.length; y++)
 					{
-						if (IDarray[0] == "Photo")
+						dataHash = allDataArray[y];
+						switch (dataHash["type"])
 						{
-							var divID = AdminPhotoManager.getPhotoWrapperDivID(IDarray[1]);
-							$('#' + divID).remove();
-							Logger.log("Deleted Photo ID " + IDarray[1], "text", "from_server", "Delete photo");
-						}
-						else if (IDarray[0] == "PhotoInstance")
-						{
-							AdminPhotoManager.removePhotoInstance(IDarray[1], IDarray[2], IDarray[3]);
-							var divID = AdminPhotoManager.getPhotoInstanceWrapperDivID(IDarray[1], IDarray[2]);
-							$('#' + divID).remove();
-							Logger.log("Deleted Photo instance ID " + IDarray[1] + "_" + IDarray[2], "text", "from_server", "Delete photo instance");
+							case "photoinstance":
+								AdminPhotoManager.removePhotoInstance(dataHash["ID"],  dataHash["instanceID"], dataHash["pageID"]);
+								var divID = AdminPhotoManager.getPhotoInstanceWrapperDivID(dataHash["ID"], dataHash["instanceID"]);
+								$('#' + divID).remove();
+								Logger.log("Deleted Photo instance ID " + dataHash["ID"] + "_" + dataHash["instanceID"], "text", "from_server", "Delete photo instance");
+								break;
+							case "photo":
+								var divID = AdminPhotoManager.getPhotoWrapperDivID(dataHash["ID"]);
+								$('#' + divID).remove();
+								Logger.log("Deleted Photo ID " + dataHash["ID"], "text", "from_server", "Delete photo");
+								break;
+							case "articleinstance":
+								AdminArticleManager.removeArticleInstance(dataHash["ID"], dataHash["instanceID"], dataHash["pageID"]);
+								var divID = AdminArticleManager.getArticleInstanceDivID(dataHash["ID"], dataHash["instanceID"]);
+								$('#' + divID).remove();
+								break;
 						}
 					}
+					/*
+					var IDarray = data.substring(8).split(",");
 					else if (IDarray[0] == "Article" || IDarray[0] == "ArticleInstance")
 					{
 						AdminArticleManager.removeArticleInstance(IDarray[1], IDarray[2], IDarray[3]);
 						var divID = AdminArticleManager.getArticleInstanceDivID(IDarray[1], IDarray[2]);
 						$('#' + divID).remove();
 					}
+					*/
 					g_objectClicked = null;
 				}
 				else if (datasetName == "pages")

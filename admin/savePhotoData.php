@@ -56,8 +56,10 @@
 						WHERE BookPhotoID = " . $client_form_data['ID'] . "
 						AND BookPagePhotoInstanceNum = " . $client_form_data['instanceID'] . ";";
 			$mysqli->query($db_str);
-			echo "Deleted:PhotoInstance," . $client_form_data['ID'] . "," . $client_form_data['instanceID'] . "," . $client_form_data['pageID'];
-			exit(0);
+			$deletedHash = array("type" => "photoinstance",
+								"ID" => $client_form_data['ID'],
+								"instanceID" => $client_form_data['instanceID'],
+								"pageID" => $client_form_data['pageID']);
 		}
 		else
 		{
@@ -71,7 +73,7 @@
 			$stmt->close();
 			if ($there_are_photo_instances)
 			{
-				echo "Error:You cannot delete a photo when there are other copies that exist";
+				printErrorMessageToClient("You cannot delete a photo when there are other copies that exist");
 				exit(0);
 			}
 			else
@@ -98,10 +100,11 @@
 							FROM BookPhotos
 							WHERE BookPhotoID = " . $client_form_data['ID'] . ";";
 				$mysqli->query($db_str);
-				echo "Deleted:Photo," . $client_form_data['ID'];
-				exit(0);
+				$deletedHash = array("type" => "photo", "ID" => $client_form_data['ID']);
 			}
 		}
+		echo json_encode(array("allData" => array("deleted" => array($deletedHash))));
+		exit(0);
 	}
 	else if ($client_form_data['mode'] == "add")
 	{
@@ -114,7 +117,7 @@
 		$next_instance_sql = $mysqli->query($next_instance_str);
 		if (!$next_instance_sql)
 		{
-			echo json_encode(array("allData" => array("error" => "no results")));
+			printErrorMessageToClient("Database error");
 			exit(0);
 		}
 		else
