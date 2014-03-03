@@ -141,7 +141,16 @@
 				dataObj['instanceID'] = articleInstanceID;
 				dataObj['BookID'] = g_bookID;
 				dataObj['LangID'] = g_defaultLangID;
+				
+				// Note: JQuery UI adds classes to the innerHTML in order to get resizable to work.
+				// You need to turn resizable off in order to get the correct inner HTML.
+				// We then immediately turn it back on.
+				// See http://stackoverflow.com/questions/2830066/jquery-resizable-ui-problem
+				// for more information
+				removeJQueryEvents($(UIelement), $(UIelement));
 				dataObj['articleText'] = $(UIelement).html();
+				addJQueryEvents($(UIelement), $(UIelement));
+
 				dataPageName = g_articleAjaxPage;
 			}
 			if (dataPageName)

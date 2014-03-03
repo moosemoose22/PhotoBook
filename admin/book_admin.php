@@ -19,7 +19,6 @@
 	var g_bookID = <?=$_SESSION["BookID"]?>;
 	var g_userLogin = "<?=$_SESSION['BookLoginUsername']?>";
 	var g_defaultLangID = "<?=$g_book_default_lang?>";
-	var g_itemDelimeter = "<?=$item_delimiter?>";
 	var g_dataDelimeter = "<?=$data_delimiter?>";
 	var g_textDelimeterReplaceAmperstand = "<?=$text_delimiter_replace_amperstand?>";
 	var g_resizeByFactor = .5;

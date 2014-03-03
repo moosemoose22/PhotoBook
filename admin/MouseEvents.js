@@ -18,26 +18,6 @@
 		return true;
 	}
 
-	function mouseInHorizontal()
-	{
-		var windowWidth = $(window).width();   // returns width of browser viewport
-		var windowHeight = $(window).height();   // returns height of browser viewport
-		var horizontalXcoord = (windowWidth * .2);
-		var horizontalYcoord = (windowHeight * .15);
-		return ( (g_mouseX > horizontalXcoord && g_mouseX < (horizontalXcoord + g_ipadLongEnd))
-			&& (g_mouseY > horizontalYcoord && g_mouseX < (horizontalYcoord + g_ipadShortEnd)));
-	}
-
-	function mouseInVertical()
-	{
-		var windowWidth = $(window).width();   // returns width of browser viewport
-		var windowHeight = $(window).height();   // returns height of browser viewport
-		var horizontalXcoord = (windowWidth * .2);
-		var horizontalYcoord = (windowHeight * .15) + g_ipadShortEnd + 2;
-		return ( (g_mouseX > horizontalXcoord && g_mouseX < (horizontalXcoord + g_ipadShortEnd))
-			&& (g_mouseY > horizontalYcoord && g_mouseX < (horizontalYcoord + g_ipadLongEnd)));
-	}
-
 	function mouseCloserToWhichIpad()
 	{
 		// If mouse is above bottom of horizontal, say it's closer to it
@@ -170,7 +150,7 @@
 			$(document).mousemove( function (e) {
 				g_mouseX = e.pageX;
 				g_mouseY = e.pageY;
-				DocumentClickManager.onMouseMove(parseInt(e.pageX, 10), parseInt(e.pageY, 10));
+				DocumentClickManager.onMouseMove(g_mouseX, g_mouseY);
 				return false;
 			});
 
@@ -242,23 +222,22 @@
 		
 		this.onMouseMove = function(Xcoord, Ycoord)
 		{
-			this.Xcoord = Xcoord;
-			this.Ycoord = Ycoord;
+			var orientation = mouseCloserToWhichIpad();
+			this.Xcoord = ((parseFloat(Xcoord) - this.getIPadOffset(orientation, "left")) * g_backwardsResizeByFactor);
+			this.Ycoord = ((parseFloat(Ycoord) - this.getIPadOffset(orientation, "top")) * g_backwardsResizeByFactor);
 			if (this.isMouseDown && !this.isArticleDrawBlocked())
 			{
 				if (this.getMode() == "text" && !this.currentArticleID)
 				{
-					mydebug("making a box! " + Xcoord, false, true);
+					//mydebug("making a box! Xcoord is " + Xcoord + ", global xcoord is " + g_mouseX, false, true);
 					this.currentArticleID = AdminArticleManager.getNewTextboxTempName();
 					this.tempStartDrawXcoord = this.Xcoord;
 					this.tempStartDrawYcoord = this.Ycoord;
 					var orientation = "horizontal";
 					this.currentArticleID = AdminArticleManager.writeArticle(AdminArticleManager.getNewTextboxTempName(), 1, "", orientation, this.Xcoord, this.Ycoord, 10, 10);
-					//this.currentArticleID = this.writeArticle(this.tempStartDrawXcoord, this.tempStartDrawYcoord);
-					mydebug("  making a box! article ID is " + this.currentArticleID, false, true);
 				}
-				$("#" + this.currentArticleID).css("width", this.Xcoord - this.tempStartDrawXcoord);
-				$("#" + this.currentArticleID).css("height", this.Ycoord - this.tempStartDrawYcoord);
+				$("#" + this.currentArticleID).css("width", g_resizeByFactor * (this.Xcoord - this.tempStartDrawXcoord));
+				$("#" + this.currentArticleID).css("height", g_resizeByFactor * (this.Ycoord - this.tempStartDrawYcoord));
 			}
 		}
 		

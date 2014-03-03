@@ -536,7 +536,7 @@
 			}
 		}
 
-		this.writeArticle = function(articleID, articleInstanceID, text, orientation, Xcoord, Ycoord, width, height, hideImage)
+		this.writeArticle = function(articleID, articleInstanceID, articleText, orientation, Xcoord, Ycoord, width, height, hideArticle)
 		{
 			var newname = g_articlePrefix + articleID + "_" + articleInstanceID;
 			var newdiv = document.createElement("div");
@@ -566,9 +566,9 @@
 				//DocumentClickManager.articleOnBlur($(this), event);
 				//;DocumentClickManager.setArticleDefaultMode(newname);
 			})*/
-			if (text.length > 0)
-				$("#" + newname).html(text);
-			if (hideImage)
+			if (articleText && articleText.length > 0)
+				$("#" + newname).html(articleText);
+			if (hideArticle)
 				$("#" + newname).hide();
 			return newname;
 		}
