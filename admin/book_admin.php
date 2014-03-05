@@ -250,7 +250,8 @@
 		if ($(UIelement1).data('uiDraggable'))
 		{
 			$(UIelement1).draggable( "destroy" );
-			$(UIelement2).resizable( "destroy" );
+			if ($(UIelement2))
+				$(UIelement2).resizable( "destroy" );
 		}
 		var divID = $(UIelement1).attr("id");
 		if (AdminArticleManager.isArticle(divID))

@@ -78,8 +78,8 @@
 		// Add article to DB if user typed new text in ********************************
 		$db_str = "INSERT INTO BookArticles (BookID) VALUES (" . $client_form_data['BookID'] . ");";
 		$mysqli->query($db_str);
-
 		$articleID = $mysqli->insert_id;
+
 		$db_str = "INSERT INTO BookArticleLangs (BookArticleID, BookArticleLangText, BookLangID)
 						VALUES (" . $articleID . ", '" . $client_form_data['articleText'] . "', '" . $client_form_data['LangID'] . "');";
 		$mysqli->query($db_str);
@@ -120,15 +120,18 @@
 				);
 	}
 
-	$allDataArray["articlesinstances"] =
-		array("ID" => $articleID,
+	// Need an array of a hash because the client expects all photo instances to be in an array,
+	// whether an array of 1 or an array of a ton
+	$allDataArray["articleinstances"] =
+		array(array("ID" => $articleID,
 			"instanceID" => $articleInstanceID,
 			"pageID" => $client_form_data['pageID'],
 			"orientation" => $client_form_data['orientation'],
 			"Xcoord" => $client_form_data['Xcoord'],
 			"Ycoord" => $client_form_data['Ycoord'],
 			"width" => $client_form_data['width'],
-			"height" => $client_form_data['height']
-		);
+			"height" => $client_form_data['height'],
+			"overwritePlaceholder" => ($client_form_data['mode'] == "add")
+		));
 	echo json_encode(array("allData" => $allDataArray));
 ?>

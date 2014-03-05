@@ -203,7 +203,7 @@
 	if ($client_form_data['loadArticles'] == "true" || $showAllData)
 		$allDataArray["articles"] = loadArticles($client_form_data['BookID'], $client_form_data['BookLang']);
 	if ($client_form_data['loadArticleInstances'] == "true" || $showAllData)
-		$allDataArray["articlesinstances"] = loadArticleInstances($client_form_data['BookID']);
+		$allDataArray["articleinstances"] = loadArticleInstances($client_form_data['BookID']);
 	if ($client_form_data['loadStackOrder'] == "true" || $showAllData)
 		$allDataArray["stackorder"] = loadStackOrder($client_form_data['BookID']);
 	echo json_encode(array("allData" => $allDataArray));

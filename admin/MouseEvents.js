@@ -230,11 +230,11 @@
 				if (this.getMode() == "text" && !this.currentArticleID)
 				{
 					//mydebug("making a box! Xcoord is " + Xcoord + ", global xcoord is " + g_mouseX, false, true);
-					this.currentArticleID = AdminArticleManager.getNewTextboxTempName();
+					var newBoxArticleID = AdminArticleManager.getNewTextboxTempName();
 					this.tempStartDrawXcoord = this.Xcoord;
 					this.tempStartDrawYcoord = this.Ycoord;
 					var orientation = "horizontal";
-					this.currentArticleID = AdminArticleManager.writeArticle(AdminArticleManager.getNewTextboxTempName(), 1, "", orientation, this.Xcoord, this.Ycoord, 10, 10);
+					this.currentArticleID = AdminArticleManager.writeArticle(newBoxArticleID, 1, "", orientation, this.Xcoord, this.Ycoord, 10, 10);
 				}
 				$("#" + this.currentArticleID).css("width", g_resizeByFactor * (this.Xcoord - this.tempStartDrawXcoord));
 				$("#" + this.currentArticleID).css("height", g_resizeByFactor * (this.Ycoord - this.tempStartDrawYcoord));
@@ -247,7 +247,7 @@
 			{
 				this.onEndArticleDraw();
 				this.isMouseDown = false;
-				this.currentArticleID = null;
+				//this.currentArticleID = null;
 			}
 		}
 		
@@ -346,7 +346,7 @@
 				g_objectClicked.blur();
 				this.articleOnClick(g_objectClicked);
 			}
-			PageManager.updatePageArticleModes(new_mode);
+			PageManager.updateAllPageArticleModes(new_mode);
 		}
 		
 		this.getIPadOffset = function(orientation, leftOrTop)

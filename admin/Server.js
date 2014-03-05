@@ -335,7 +335,7 @@
 						}
 					}
 				}
-				else if (datasetName == "articlesinstances")
+				else if (datasetName == "articleinstances")
 				{
 					var allDataArray = allDataSetsObj[datasetName];
 					var mode, isNewArticleInstance, loggingIn;
@@ -344,7 +344,7 @@
 						dataHash = allDataArray[y];
 						AdminArticleManager.addUpdateArticleInstance(dataHash['ID'], dataHash['instanceID'], dataHash['pageID'],
 							dataHash['orientation'], dataHash['Xcoord'], dataHash['Ycoord'],
-							dataHash['width'], dataHash['height'], isAddingMode, loggingIn);
+							dataHash['width'], dataHash['height'], dataHash['overwritePlaceholder'], isAddingMode, loggingIn);
 					}
 				}
 				else if (datasetName == "stackorder")

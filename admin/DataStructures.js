@@ -218,17 +218,19 @@
 				StackOrderManager.setPhotoStackOrderInsideIpad(AdminPhotoManager.getPhotoInstanceWrapperDivID(instanceObj.parentID, instanceObj.instanceID), instanceObj.parentID, instanceObj.instanceID);
 			}
 		}
-		this.updatePageArticleModes = function(new_mode)
+		this.updateAllPageArticleModes = function(new_mode)
 		{
 			var pageObj = this.pages[this.getCurrentPageID()];
-			for (var pageArticleIndex = 0; pageArticleIndex < pageObj.articles.length; pageArticleIndex++)
-			{
-				var divID = AdminArticleManager.getArticleInstanceDivID(pageObj.articles[pageArticleIndex].parentID, pageObj.articles[pageArticleIndex].instanceID);
-				if (new_mode == "default")
-					addJQueryEvents($("#" + divID));
-				else if (new_mode == "text")
-					removeJQueryEvents($("#" + divID));
-			}
+			for (var pageArticleIndex = 0, lastArticleIndex = pageObj.articles.length; pageArticleIndex < lastArticleIndex; pageArticleIndex++)
+				this.updatePageArticleMode(new_mode, pageObj.articles[pageArticleIndex].parentID, pageObj.articles[pageArticleIndex].instanceID);
+		}
+		this.updatePageArticleMode = function(new_mode, parentID, instanceID)
+		{
+			var divID = AdminArticleManager.getArticleInstanceDivID(parentID, instanceID);
+			if (new_mode == "default")
+				addJQueryEvents($("#" + divID), $("#" + divID));
+			else if (new_mode == "text")
+				removeJQueryEvents($("#" + divID), $("#" + divID));
 		}
 		this.storeStackOrder = function(ID, instanceID, pageID, objectType, stackOrder)
 		{
@@ -495,7 +497,7 @@
 					this.writeSharedArticle(articleID);
 			}
 		}
-		this.addUpdateArticleInstance = function(articleID, articleInstanceID, pageID, orientation, Xcoord, Ycoord, imgWidth, imgHeight, writeImage, loggingIn)
+		this.addUpdateArticleInstance = function(articleID, articleInstanceID, pageID, orientation, Xcoord, Ycoord, imgWidth, imgHeight, overwritePlaceholder, writeArticle, loggingIn)
 		{
 			Logger.log(arguments, "function", "from_server", "addUpdateArticleInstance");
 			articleID = parseInt(articleID), articleInstanceID = parseInt(articleInstanceID);
@@ -514,7 +516,13 @@
 			articleInstanceObj.Ycoord = Ycoord;
 			articleInstanceObj.width = imgWidth;
 			articleInstanceObj.height = imgHeight;
-			if (writeImage)
+			if (overwritePlaceholder)
+			{
+				var textElementObj = $("#" + DocumentClickManager.currentArticleID);
+				$(textElementObj).attr("id", this.getArticleInstanceDivID(articleID, articleInstanceID));
+				PageManager.updatePageArticleMode("text", articleID, articleInstanceID);
+			}
+			else if (writeArticle)
 				this.writeArticle(articleID, articleInstanceID, this.articleHash[articleID].text, orientation, Xcoord, Ycoord, imgWidth, imgHeight, loggingIn);
 			if (!loggingIn)
 				PageManager.addStackOrder(pageID, articleID, articleInstanceID, g_articleObjectType);

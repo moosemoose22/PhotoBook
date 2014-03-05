@@ -161,6 +161,9 @@
 		$mysqli->query($db_str);
 	$allDataArray = array();
 	$allDataArray["globals"] = array("loggingIn" => "false", "mode" => $client_form_data['mode']);
+	
+	// Need an array of a hash because the client expects all photo instances to be in an array,
+	// whether an array of 1 or an array of a ton
 	$allDataArray["photoinstances"] = array(array("ID" => $client_form_data['ID'],
 		"instanceID" => $photoInstanceID,
 		"pageID" => $client_form_data['pageID'],
