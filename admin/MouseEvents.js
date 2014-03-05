@@ -144,26 +144,27 @@
 			$("body").on("click", function(event)
 			{
 				DocumentClickManager.defocusArticle();
-				return false;
+				//return false;
 			});
 
 			$(document).mousemove( function (e) {
 				g_mouseX = e.pageX;
 				g_mouseY = e.pageY;
 				DocumentClickManager.onMouseMove(g_mouseX, g_mouseY);
-				return false;
+				//return false;
 			});
 
 			$(document).mousedown( function() {
 				DocumentClickManager.isMouseDown = true;
-				return false;
+				//return false;
 			});
 
 			$(document).mouseup( function()
 			{
 				DocumentClickManager.onMouseUp();
-				return false;
+				//return false;
 			});
+
 			$("#toolbar").hover(
 				function () {
 					$(this).css("cursor", "move");

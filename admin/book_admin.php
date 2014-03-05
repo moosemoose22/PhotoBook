@@ -9,8 +9,6 @@
 <title>Photobook admin</title>
 <script src="http://code.jquery.com/jquery-1.10.1.js"></script>
 <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-<script src="jquery/perfect_scrollbar/perfect-scrollbar.js"></script>
-<script src="jquery/perfect_scrollbar/jquery.mousewheel.js"></script>
 <script src="Server.js"></script>
 <script src="MouseEvents.js"></script>
 <script src="DataStructures.js"></script>
@@ -310,9 +308,6 @@
 		$("#articles_div").offset({ top: (windowHeight * .15), left: 20 + photosDivWidth });
 		$("#articles_div").css('width', ((g_smallImgLongEnd + 80 + p_getScrollbarWidth()) * g_resizeByFactor) + 'px');
 		$("#articles_div").css('height', (windowHeight - (windowHeight * .15) - p_getScrollbarWidth()) + 'px');
-		$("#story").offset({ top: (g_ipadShortEnd + g_ipadLongEnd + (windowHeight * .15)), left: 0 });
-		$("#story").css('width', (80) + '%');
-		$("#story").css('height', '400px');
 	}
 	
 	function changePage(pageNum)
@@ -520,7 +515,6 @@ function moveIPad(iPadType)
 		resizePage();
 		DocumentClickManager.init();
 		$(window).bind('resize', resizePage);
-		$('#HorizontalPageLayout').perfectScrollbar();
 <?
 	// Book data population ***********************************
 	$book_str = "SELECT BookID, BookTitle
@@ -584,7 +578,6 @@ function moveIPad(iPadType)
 //********************************
 </script>
 <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/themes/base/jquery-ui.css" type="text/css" media="all" />
-<link rel="stylesheet" href="jquery/perfect_scrollbar/perfect-scrollbar.css" />
  
 <style>
 	div.sidebarImage
@@ -606,7 +599,7 @@ function moveIPad(iPadType)
 	div.initBook
 	{
 		background-color: gray;
-		position: absolute;
+		position: relative;
 		border: 1px solid black;
 		text-align: center;
 		vertical-align: middle;
@@ -615,7 +608,7 @@ function moveIPad(iPadType)
 	}
 	div.sideBarDiv
 	{
-		position: absolute;
+		position: relative;
 		background-color: white;
 	}
 	div.smallpage
@@ -672,7 +665,7 @@ function moveIPad(iPadType)
     </ul>
   </li>
 -->
-	<? include("toolbar.inc") ?>
+	<? include("toolbar.inc"); ?>
 	<div style="overflow-y:scroll; background-color: white; border: 1px solid black; position: relative; z-index:101" id="photos_div">Photos:<br/></div>
 	<div style="overflow-y:scroll; background-color: white; border: 1px solid black; position: relative; z-index:101" id="articles_div">Shared Articles:<br/></div>
 	<div id="masthead" class="sideBarDiv" style="width:100px;height:20px">
@@ -680,9 +673,6 @@ function moveIPad(iPadType)
 		Book: <select id="BookSelect"></select>
 		<button type="button" onclick="Logger.showLog('from_server')">Show log from server</button>
 		<button type="button" onclick="Logger.showLog('to_server')">Show log to server</button>
-		<!--<button type="button" onclick="g_alertMe=!g_alertMe;$('#debug').show()">Alert toggle</button>
-		<button type="button" onclick="window.scrollBy(50, 50)">Scroll</button>
-		<button type="button" onclick="$(g_objectClicked).focus()">Focus</button>-->
 		<span id="debug" style="display:none"></span>
 	</div>
 	<div id="leftbar" class="sideBarDiv" style="width:20px; height:80px"></div>
@@ -695,7 +685,6 @@ function moveIPad(iPadType)
 			<div id="pages_container">
 			</div>
 	</div>
-	<div id="story"></div>
 </body>
 </html>
 <? include("../_sharedIncludes/dbclose.php") ?>
