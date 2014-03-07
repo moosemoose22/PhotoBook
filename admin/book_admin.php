@@ -599,7 +599,7 @@ function moveIPad(iPadType)
 	div.initBook
 	{
 		background-color: gray;
-		position: relative;
+		position: absolute;
 		border: 1px solid black;
 		text-align: center;
 		vertical-align: middle;
@@ -608,7 +608,7 @@ function moveIPad(iPadType)
 	}
 	div.sideBarDiv
 	{
-		position: relative;
+		position: absolute;
 		background-color: white;
 	}
 	div.smallpage
@@ -666,8 +666,8 @@ function moveIPad(iPadType)
   </li>
 -->
 	<? include("toolbar.inc"); ?>
-	<div style="overflow-y:scroll; background-color: white; border: 1px solid black; position: relative; z-index:101" id="photos_div">Photos:<br/></div>
-	<div style="overflow-y:scroll; background-color: white; border: 1px solid black; position: relative; z-index:101" id="articles_div">Shared Articles:<br/></div>
+	<div style="overflow-y:scroll; background-color: white; border: 1px solid black; position: absolute; z-index:101" id="photos_div">Photos:<br/></div>
+	<div style="overflow-y:scroll; background-color: white; border: 1px solid black; position: absolute; z-index:101" id="articles_div">Shared Articles:<br/></div>
 	<div id="masthead" class="sideBarDiv" style="width:100px;height:20px">
 		<h2>Photobook admin</h2>
 		Book: <select id="BookSelect"></select>

@@ -340,12 +340,17 @@
 		{
 			this.p_Mode = new_mode;
 			$("body").css("cursor", new_mode);
-			if (new_mode == "default" && g_objectClicked)
+			if (g_objectClicked)
 			{
-				g_objectClicked.blur();
-				this.articleOnClick(g_objectClicked);
+				var divID = $(g_objectClicked).attr("id");
+				if (AdminArticleManager.isArticle(divID) && new_mode == "default")
+				{
+					g_objectClicked.blur();
+					this.articleOnClick(g_objectClicked);
+					Communicator.prepareServerMessage($(g_objectClicked), g_articleObjectType);
+				}
+				PageManager.updateAllPageArticleModes(new_mode);
 			}
-			PageManager.updateAllPageArticleModes(new_mode);
 		}
 		
 		this.getIPadOffset = function(orientation, leftOrTop)
