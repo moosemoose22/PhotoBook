@@ -9,6 +9,12 @@
 		var g_orientation = "landscape";
 		var g_showArticles = false;
 		var g_showImageData = false;
+		function objectContainer()
+		{
+			this.landscape;
+			this.portrait;
+		}
+		
 		function imageObj()
 		{
 			this.URL;
@@ -81,7 +87,8 @@ Whenever you get a PHP error with DBs, use this code
 		// **********************************************
 		$query_str = "SELECT pages.BookPageID, pages.BookPageNum, pagePhotos.BookPagePhotoInstanceNum,
 					pagePhotos.BookPagePhotoIpadOrientation,
-					pagePhotos.BookPagePhotoXCoord, pagePhotos.BookPagePhotoYCoord, photos.*
+					pagePhotos.BookPagePhotoXCoord, pagePhotos.BookPagePhotoYCoord, photos.BookPhotoURL,
+					photos.BookPhotoCaption, photos.BookPhotoDate
 			FROM BookPages pages
 			INNER JOIN BookPagePhotos pagePhotos
 				ON pages.BookPageID = pagePhotos.BookPageID
@@ -114,7 +121,9 @@ Whenever you get a PHP error with DBs, use this code
 		// **********************************************
 		$query_str = "SELECT pages.BookPageNum, pageArticles.BookPageArticleIpadOrientation,
 				pageArticles.BookPageArticleWidth, pageArticles.BookPageArticleHeight,
-				pageArticles.BookPageArticleXCoord, pageArticles.BookPageArticleYCoord, articlesTranslated.*
+				pageArticles.BookPageArticleXCoord, pageArticles.BookPageArticleYCoord,
+				articlesTranslated.BookArticleLangTitle, articlesTranslated.BookArticleLangAuthor,
+				articlesTranslated.BookArticleLangText
 			FROM BookPages pages
 			INNER JOIN BookPageArticles pageArticles
 				ON  pages.BookPageID = pageArticles.BookPageID
