@@ -47,27 +47,6 @@
 			progressBarContainer.appendChild(progressBar);
 			span.appendChild(progressBarContainer);
 			
-			/*
-				If the file is an image and the web browser supports FileReader,
-				present a preview in the file list
-			*/
-			///////////////////////////////////////////////////////
-			// NOTE: Commenting out. We only want to show uploaded files
-			/*
-			if (typeof FileReader !== "undefined" && (/image/i).test(file.type))
-			{
-				img = document.createElement("img");
-				span.appendChild(img);
-				reader = new FileReader();
-				reader.onload = (function (theImg) {
-					return function (evt) {
-						theImg.src = evt.target.result;
-					};
-				}(img));
-				reader.readAsDataURL(file);
-			}
-			*/
-			
 			// Uploading - for Firefox, Google Chrome and Safari
 			xhr = new XMLHttpRequest();
 			
@@ -84,7 +63,6 @@
 			xhr.addEventListener("load", function ()
 			{
 				progressBarContainer.className += " uploaded";
-				//progressBar.innerHTML = "Uploaded!";
 			}, false);
 			
 			xhr.addEventListener("readystatechange", function()
@@ -92,32 +70,10 @@
 				if (xhr.readyState==4 && xhr.status==200)
 				{
 					if (xhr.responseText.substring(0, 8) == "Success:")
-					{
 						processSuccess(xhr.responseText.substring(8), window.self);
-					/*
-						var elem = document.getElementById("no-items");
-						if (elem)
-							elem.parentNode.removeChild(elem);
-						var img = document.createElement("img");
-						var uploadedImage = g_imagesUploadArray.shift();
-						var imageExtension = getExtension(uploadedImage);
-						var newImage = uploadedImage.replace("." + imageExtension, "_small." + imageExtension);
-						img.src = "/images/book/<?=$_SESSION["BookLoginUsername"]?>/" + newImage;
-						document.getElementById("images").appendChild(img);
-					}
-					else
-						alert(xhr.responseText);
-					*/
-					}
 				}
 			}, false);
-/*
-			xhr.onreadystatechange=function()
-			{
-				if (xhr.readyState==4 && xhr.status==200)
-					alert(xhr.responseText);
-			}
-*/
+
 			xhr.open("post", "/book/admin/uploadPix_process.php", true);
 			
 			// Set appropriate headers
@@ -201,10 +157,7 @@
 		echo "g_photoMap['" . $row['BookPhotoID'] . "'] = \"" . $row['BookPhotoURL'] . "\";\n";
 	}
 	$images_sql->free();
-//	if (!$hasResults)
-//		echo "<li class=\"no-items\" id=\"no-items\">(no images)</li>";
 ?>
-			//showImages();
 			addListeners();
 		}
 		
@@ -223,7 +176,6 @@
 				document.getElementById("file-list").appendChild(img);
 				document.getElementById(photoID).addEventListener('mousedown', mouseDown, false);
 			}
-			//document.getElementById("file-list").addEventListener('mousedown', mouseDown, false);
 		}
 
 		function addListeners()
@@ -233,7 +185,6 @@
 
 		function mouseUp(e)
 		{
-			alert(e);
 			window.removeEventListener('mousemove', divMove, true);
 		}
 
@@ -254,7 +205,6 @@
 				img.style.top += (e.clientY - img.style.top);
 				img.offsetLeft += (e.clientX - img.offsetLeft);
 			}
-			//alert(img.style.left + "     " + img.offsetLeft);
 		}	
 		
 		function processSuccess(text, winRef)
