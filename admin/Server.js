@@ -8,7 +8,7 @@
 		this.publishBook = function()
 		{
 			if (confirm("Are you sure you want to publish ?\nYou'll overwrite the current live version."))
-				this.saveDataOnServer("mode=publishBook&bookID=" + g_bookID, g_photoAjaxPage);
+				this.saveDataOnServer({mode: "publish",bookID: g_bookID}, g_photoAjaxPage);
 		}
 	
 		this.loadData = function(dataRequested)
@@ -232,9 +232,15 @@
 			for (var datasetName in allDataSetsObj)
 			{
 				if (datasetName == "error")
+				{
+					Logger.log("Error: " + allDataSetsObj[datasetName], "text", "from_server");
 					alert("Error is: " + allDataSetsObj[datasetName]);
+				}
 				else if (datasetName == "published")
+				{
+					Logger.log("Book published!!", "text", "from_server");
 					alert("Your book was published!");
+				}
 				else if (datasetName == "deleted")
 				{
 					var allDataArray = allDataSetsObj[datasetName];

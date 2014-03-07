@@ -84,8 +84,8 @@
 		$new_filename = str_replace(".", $GLOBALS["g_suffix_small_image"] . ".", $filename);
 		$image->save($fullImagePath . "/" . $new_filename);
 
-		$db_insert_str = "INSERT INTO BookPhotos (BookLoginUsername, BookPhotoURL, BookPhotoWidth, BookPhotoHeight, BookPhotoWidthSmall, BookPhotoHeightSmall)
-						VALUES ('" . $_SESSION["BookLoginUsername"] . "', '$filename', $uploadedWidth, $uploadedHeight, " . $image->getWidth() . ", " . $image->getHeight() . ");";
+		$db_insert_str = "INSERT INTO BookPhotos (BookLoginUsername, BookID, BookPhotoURL, BookPhotoWidth, BookPhotoHeight, BookPhotoWidthSmall, BookPhotoHeightSmall)
+						VALUES ('" . $_SESSION["BookLoginUsername"] . "', " . $_SESSION["BookID"] . ",'$filename', $uploadedWidth, $uploadedHeight, " . $image->getWidth() . ", " . $image->getHeight() . ");";
 		
 		$mysqli->query($db_insert_str);
 		$photoDataForClient = $mysqli->insert_id . $GLOBALS["data_delimiter"] . $filename  . $GLOBALS["data_delimiter"] . $uploadedWidth

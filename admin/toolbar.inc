@@ -46,7 +46,7 @@
 			<tr>
 				<td><img title="Add book" src="<?=$g_system_icon_web_location?>book/add_book.jpg" /></td>
 				<td><img title="Add language" src="<?=$g_system_icon_web_location?>book/add_language.jpg" /></td>
-				<td><img title="Publish book" src="<?=$g_system_icon_web_location?>book/publish_book.jpg" /></td>
+				<td><img title="Publish book" src="<?=$g_system_icon_web_location?>book/publish_book.jpg" onclick="Communicator.publishBook()" /></td>
 			</tr>
 			</table>
 		</td></tr>

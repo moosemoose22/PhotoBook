@@ -5,7 +5,7 @@
 	
 	$client_form_data = json_decode(file_get_contents('php://input'), true);
 	$photoInstanceID = "";
-	if ($client_form_data['mode'] == "publishBook")
+	if ($client_form_data['mode'] == "publish")
 	{
 		// Page photo population **********************************
 		$pix_str = "SELECT BookPagePhotoID, BookPhotoURL, BookPageID, BookPagePhotoInstanceNum,
@@ -45,7 +45,7 @@
 			$image->save($g_image_directory_path_user . $new_filename);
 		}
 		$images_sql->free();
-		echo "Published!";
+		echo json_encode(array("allData" => array("published" => "true")));
 		exit(0);
 	}
 	else if ($client_form_data['mode'] == "delete")
