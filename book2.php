@@ -14,16 +14,20 @@
 			this.URL;
 			this.caption;
 			this.imgDate;
-			this.landscapeXcoord;
-			this.landscapeYcoord;
-			this.portraitXcoord;
-			this.portraitYcoord;
+			this.Xcoord;
+			this.Ycoord;
+			this.orientation
+			this.stackOrder = 1;
 		}
 		function articlesObj()
 		{
 			this.articleTitle;
 			this.author;
 			this.articleText;
+			this.Xcoord;
+			this.Ycoord;
+			this.orientation
+			this.stackOrder = 1;
 		}
 		var newImgObj;
 		var newArticleObj;
@@ -38,7 +42,10 @@ Whenever you get a PHP error with DBs, use this code
 *******************************/
 
 	if ($BookID == "" || !is_numeric($BookID))
-		;//echo "No book available";
+	{
+		echo "</script></head><body>" .
+				"Please specify a bookID in the URL<br />Example:book2.php?bookID=1";
+	}
 	else
 	{
 		// **********************************************
@@ -73,7 +80,7 @@ Whenever you get a PHP error with DBs, use this code
 		// Grabbing all photos (if any)
 		// **********************************************
 		$query_str = "SELECT pages.BookPageID, pages.BookPageNum, pagePhotos.BookPagePhotoInstanceNum,
-					pagePhotos.BookPagePhotoIpadOrientation, pagePhotos.BookPagePhotoStackOrder,
+					pagePhotos.BookPagePhotoIpadOrientation,
 					pagePhotos.BookPagePhotoXCoord, pagePhotos.BookPagePhotoYCoord, photos.*
 			FROM BookPages pages
 			INNER JOIN BookPagePhotos pagePhotos
@@ -97,7 +104,6 @@ Whenever you get a PHP error with DBs, use this code
 				newImgObj.Xcoord = "<?=$row['BookPagePhotoXCoord']?>";
 				newImgObj.Ycoord = "<?=$row['BookPagePhotoYCoord']?>";
 				newImgObj.orientation = "<?=$row['BookPagePhotoIpadOrientation']?>";
-				newImgObj.stackOrder = "<?=$row['BookPagePhotoStackOrder']?>";
 				imageArr.push(newImgObj);
 <?
 		}
@@ -106,8 +112,9 @@ Whenever you get a PHP error with DBs, use this code
 		// **********************************************
 		// Grabbing all articles (if any)
 		// **********************************************
-		$query_str = "SELECT pages.BookPageNum, pageArticles.BookPageArtLandscapeX, pageArticles.BookPageArtLandscapeY,
-					pageArticles.BookPageArtPortraitX, pageArticles.BookPageArtPortraitY, articlesTranslated.*
+		$query_str = "SELECT pages.BookPageNum, pageArticles.BookPageArticleIpadOrientation,
+				pageArticles.BookPageArticleWidth, pageArticles.BookPageArticleHeight,
+				pageArticles.BookPageArticleXCoord, pageArticles.BookPageArticleYCoord, articlesTranslated.*
 			FROM BookPages pages
 			INNER JOIN BookPageArticles pageArticles
 				ON  pages.BookPageID = pageArticles.BookPageID
@@ -124,10 +131,11 @@ Whenever you get a PHP error with DBs, use this code
 			newArticleObj.articleTitle = <?=json_encode($row['BookArticleLangTitle'])?>;
 			newArticleObj.author = "<?=$row['BookArticleLangAuthor']?>";
 			newArticleObj.articleText = <?=json_encode($row['BookArticleLangText'])?>;
-			newArticleObj.landscapeXcoord = "<?=$row['BookPageArtLandscapeX']?>";
-			newArticleObj.landscapeYcoord = "<?=$row['BookPageArtLandscapeY']?>";
-			newArticleObj.portraitXcoord = "<?=$row['BookPageArtPortraitX']?>";
-			newArticleObj.portraitYcoord = "<?=$row['BookPageArtPortraitY']?>";
+			newArticleObj.Xcoord = "<?=$row['BookPageArticleXCoord']?>";
+			newArticleObj.Ycoord = "<?=$row['BookPageArticleYCoord']?>";
+			newArticleObj.width = <?=$row['BookPageArticleWidth']?>;
+			newArticleObj.height = <?=$row['BookPageArticleHeight']?>;
+			newArticleObj.orientation = "<?=$row['BookPageArticleIpadOrientation']?>";
 			articleArr.push(newArticleObj);
 <?		}
 		$articles_mysql->free();
@@ -175,11 +183,13 @@ and to switch pages and deal with rotating iPad
 				oArticle = document.createElement('div');
 				oArticle.id ='art' + x;
 				oArticle.style.position='absolute';
-				oArticle.style.display='none';
 				oArticle.innerHTML = "<h4>" + articleArr[x].articleTitle + "</h4>" + articleArr[x].articleText;
-				oArticle.style.left = articleArr[x].landscapeXcoord;
-				oArticle.style.top = articleArr[x].landscapeYcoord;
-				oArticle.style.zIndex = 1;
+				oArticle.style.left = articleArr[x].Xcoord;
+				oArticle.style.top = articleArr[x].Ycoord;
+				oArticle.style.width = articleArr[x].width;
+				oArticle.style.height = articleArr[x].height;
+				oArticle.style.zIndex = articleArr[x].stackOrder;
+				oArticle.style.overflowY = "auto";
 				root.appendChild(oArticle);
 			}
 		}
@@ -207,13 +217,13 @@ and to switch pages and deal with rotating iPad
 			document.getElementById("rotateButton").innerHTML = isLandscape ? "Make iPad horizontal" : "Make iPad verticle";
 			for (var x = 0; x < imageArr.length; x++)
 			{
-				document.getElementById("img" + x).style.left = isLandscape ? imageArr[x].portraitXcoord : imageArr[x].landscapeXcoord;
-				document.getElementById("img" + x).style.top = isLandscape ? imageArr[x].portraitYcoord : imageArr[x].landscapeYcoord;
+				document.getElementById("img" + x).style.left = imageArr[x].Xcoord;
+				document.getElementById("img" + x).style.top = imageArr[x].Ycoord;
 			}
 			for (x = 0; x < articleArr.length; x++)
 			{
-				document.getElementById("art" + x).style.left = isLandscape ? articleArr[x].portraitXcoord : articleArr[x].landscapeXcoord;
-				document.getElementById("art" + x).style.top = isLandscape ? articleArr[x].portraitYcoord : articleArr[x].landscapeYcoord;
+				document.getElementById("art" + x).style.left = articleArr[x].Xcoord;
+				document.getElementById("art" + x).style.top = articleArr[x].Ycoord;
 			}
 			g_orientation = isLandscape ? "portrait" : "landscape";
 		}
