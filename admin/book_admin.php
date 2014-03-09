@@ -7,7 +7,7 @@
 <html>
 <head>
 <title>Photobook admin</title>
-<script src="http://code.jquery.com/jquery-1.10.1.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.0.js"></script>
 <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 <script src="Server.js"></script>
 <script src="MouseEvents.js"></script>

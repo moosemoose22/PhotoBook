@@ -52,22 +52,24 @@
 		return $photos_array;
 	}
 
-	function loadPhotoInstances($UserLogin, $BookID)
+	function loadPhotoInstances($BookID, $PageID)
 	{
 		$photo_instance_array = array();
-		if (empty($UserLogin) || empty($BookID))
-			return array_push($photo_instance_array, array("error" => "PhotoInstance has no book ID or user login"));
+		if (empty($BookID))
+			return array_push($photo_instance_array, array("error" => "PhotoInstance has no book ID"));
 		$mysqli = $GLOBALS["mysqli"];
 		// Page photo population **********************************
 		$pix_str = "SELECT BookPhotoID, BookPagePhotoInstanceNum, BookPageID, BookPagePhotoIpadOrientation, 
 					BookPagePhotoXCoord, BookPagePhotoYCoord, BookPagePhotoWidth, BookPagePhotoHeight,
 					IF(BookPagePhotoStretchToFill,'true','false') as BookPagePhotoStretchToFill
 					FROM BookPagePhotos
-					WHERE BookPhotoID IN
+					WHERE ";
+		if (!is_null($PageID))
+			$pix_str .= "BookPageID = {$PageID} AND ";
+		$pix_str .= "BookPhotoID IN
 						(SELECT BookPhotoID
 						FROM BookPhotos
-						WHERE BookLoginUsername = '" . $UserLogin . "'
-							AND BookID = " . $BookID . ")
+						WHERE BookID = " . $BookID . ")
 					ORDER BY BookPhotoID, BookPagePhotoInstanceNum;";
 	
 		$images_sql = $mysqli->query($pix_str);
@@ -118,7 +120,7 @@
 		return $articles_array;
 	}
 
-	function loadArticleInstances($BookID)
+	function loadArticleInstances($BookID, $PageID)
 	{
 		$article_instance_array = array();
 		if (empty($BookID))
@@ -129,7 +131,10 @@
 						pageArticles.BookPageArticleXCoord, pageArticles.BookPageArticleYCoord,
 						pageArticles.BookPageArticleWidth, pageArticles.BookPageArticleHeight
 						FROM BookPageArticles pageArticles
-						WHERE pageArticles.BookArticleID IN
+						WHERE ";
+		if (!is_null($PageID))
+			$articles_instance_str .= "pageArticles.BookPageID = {$PageID} AND ";
+		$articles_instance_str .= "pageArticles.BookArticleID IN
 							(SELECT BookArticleID
 							FROM BookArticles
 							WHERE BookID = " . $BookID . ")
@@ -154,7 +159,7 @@
 		return $article_instance_array;
 	}
 	
-	function loadStackOrder($BookID)
+	function loadStackOrder($BookID, $PageID)
 	{
 		$stack_order_array = array();
 		if (empty($BookID))
@@ -166,15 +171,19 @@
 							FROM BookPageStackOrder stackOrder
 							INNER JOIN BookPageArticles pageArticles
 								ON stackOrder.BookPageStackOrderTableID = pageArticles.BookPageArticleID
-							WHERE BookPageStackOrderTableName = 'Article'
-							UNION
+							WHERE BookPageStackOrderTableName = 'Article' ";
+		if (!is_null($PageID))
+			$stack_order_str .= "AND BookPageID = {$PageID} ";
+		$stack_order_str .= "UNION
 							SELECT BookPageStackOrderTableName, BookPageID, BookPhotoID as ID, BookPagePhotoInstanceNum as instanceID,
 								BookPagePhotoIpadOrientation as orientation, BookPageStackOrderVal
 							FROM BookPageStackOrder stackOrder
 							INNER JOIN BookPagePhotos pagePhotos
 								ON stackOrder.BookPageStackOrderTableID = pagePhotos.BookPagePhotoID
-							WHERE BookPageStackOrderTableName = 'Photo'
-							ORDER BY BookPageID, BookPageStackOrderVal;";
+							WHERE BookPageStackOrderTableName = 'Photo'";
+		if (isset($PageID))
+			$stack_order_str .= "AND BookPageID = {$PageID} ";
+		$stack_order_str .= "ORDER BY BookPageID, BookPageStackOrderVal;";
 		$stack_order_sql = $mysqli->query($stack_order_str);
 		while ($row = $stack_order_sql->fetch_assoc())
 		{
@@ -188,9 +197,19 @@
 				)
 			);
 		}
+		$stack_order_sql->free();
 		return $stack_order_array;
 	}
-	$printString = "";
+	
+	function loadPageData($BookID, $PageID, $BookLang)
+	{
+		$pageDataArray = array();
+		$pageDataArray["photoinstances"] = loadPhotoInstances($BookID, $PageID);
+		$pageDataArray["articleinstances"] = loadArticleInstances($BookID, $PageID);
+		$pageDataArray["stackorder"] = loadStackOrder($BookID, $PageID);
+		return $pageDataArray;
+	}
+
 	$allDataArray = array();
 	if ($showAllData)
 		$allDataArray["globals"] = array("loggingIn" => "true", "mode" => "add");
@@ -199,12 +218,15 @@
 	if ($client_form_data['loadPhotos'] == "true" || $showAllData)
 		$allDataArray["photos"] = loadPhotos($client_form_data['UserLogin']);
 	if ($client_form_data['loadPhotoInstances'] == "true" || $showAllData)
-		$allDataArray["photoinstances"] = loadPhotoInstances($client_form_data['UserLogin'], $client_form_data['BookID']);
+		$allDataArray["photoinstances"] = loadPhotoInstances($client_form_data['BookID'], null);
 	if ($client_form_data['loadArticles'] == "true" || $showAllData)
 		$allDataArray["articles"] = loadArticles($client_form_data['BookID'], $client_form_data['BookLang']);
 	if ($client_form_data['loadArticleInstances'] == "true" || $showAllData)
-		$allDataArray["articleinstances"] = loadArticleInstances($client_form_data['BookID']);
+		$allDataArray["articleinstances"] = loadArticleInstances($client_form_data['BookID'], null);
 	if ($client_form_data['loadStackOrder'] == "true" || $showAllData)
-		$allDataArray["stackorder"] = loadStackOrder($client_form_data['BookID']);
+		$allDataArray["stackorder"] = loadStackOrder($client_form_data['BookID'], null);
+
+	if ($client_form_data['loadPageData'] == "true")
+		$allDataArray = loadPageData($client_form_data['bookID'], $client_form_data['pageID'], $client_form_data['bookLang']);
 	echo json_encode(array("allData" => $allDataArray));
 ?>

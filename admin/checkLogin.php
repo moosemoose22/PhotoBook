@@ -35,13 +35,13 @@ header("Location: {$g_admin_location}chooseBook.php");
 			}
 			else
 			{
-				$book_title_str = "SELECT BookTitle, BookLangID
+				$book_title_str = "SELECT BookTitle, BookDefaultLangID
 									FROM Books
 									WHERE BookID = " . $_SESSION['BookID'] . ";";
 				$book_title_sql = $mysqli->query($book_title_str);
 				$row = $book_title_sql->fetch_assoc();
 				$g_book_title = $row['BookTitle'];
-				$g_book_default_lang = $row['BookLangID'];
+				$g_book_default_lang = $row['BookDefaultLangID'];
 				$book_title_sql->free();							
 			}
 		}

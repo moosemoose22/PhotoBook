@@ -182,4 +182,6 @@
 	*******************************************/
 	//echo json_encode(array("allData" => array("error" => $db_str)));
 	//exit(0);
+
+	include("../_sharedIncludes/dbclose.php");
 ?>
