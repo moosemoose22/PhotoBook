@@ -1,97 +1,3 @@
-
-//********************************
-// Begin data structures
-	function book(ID, title)
-	{
-		this.ID = ID;
-		this.title = title;
-	}
-	
-	function photo(ID, URL, photoWidth, photoHeight, photoWidthSmall, photoHeightSmall)
-	{
-		this.ID = ID;
-		this.URL = URL;
-		this.photoWidth = photoWidth;
-		this.photoHeight = photoHeight;
-		this.photoWidthSmall = photoWidthSmall;
-		this.photoHeightSmall = photoHeightSmall;
-		// have multiple copies ber book!
-		this.isInBook = false;
-		this.instances = new Array();
-	}
-	
-	function article(ID)
-	{
-		this.ID = ID;
-		this.title;
-		this.text;
-		this.isShared;
-		this.instances = new Array();
-	}
-	
-	function objectInstance(parentID, instanceID, type)
-	{
-		this.type = type;
-		this.parentID = parentID;
-		this.instanceID = instanceID;
-		this.pageID;
-		this.ipadOrientation;
-		this.Xcoord;
-		this.Ycoord;
-		this.width;
-		this.height;
-		this.stackOrder;
-		this.stretchToFill;
-	}
-
-/*
-	function photoInstance(photoID, photoInstanceID)
-	{
-		this.type = "Photo";
-		this.parentID = photoID;
-		this.instanceID = photoInstanceID;
-		this.pageID;
-		this.ipadOrientation;
-		this.Xcoord;
-		this.Ycoord;
-		this.width;
-		this.height;
-		this.stackOrder;
-		this.stretchToFill;
-	}
-	
-	function articleInstance(articleID, articleInstanceID)
-	{
-		this.type = "Article";
-		this.parentID = articleID;
-		this.instanceID = articleInstanceID;
-		this.pageID;
-		this.ipadOrientation;
-		this.Xcoord;
-		this.Ycoord;
-		this.width;
-		this.height;
-		this.stackOrder;
-	}
-
-	function stackOrder(ID, instanceID, objectType, stackOrder)
-	{
-		this.ID = ID;
-		this.instanceID = instanceID;
-		this.objectType = objectType;
-		this.stackOrder = stackOrder;
-	}
-*/	
-	function page(bookID, pageNumber)
-	{
-		this.bookID = bookID;
-		this.pageNumber = pageNumber;
-		this.reattachedPhotos = false;
-		this.photos = new Array();
-		this.articles = new Array();
-		this.stackOrderArray = new Array();
-	}
-
 	var PageManager = new function()
 	{
 		this.pages = {};
@@ -110,7 +16,7 @@
 		{
 			Logger.log(arguments, "function", "from_server", "addPage");
 			this.pageIDs[pageNumber - 1] = pageID;
-			this.pages[pageID] = new page(bookID, pageNumber);
+			this.pages[pageID] = new page(bookID, pageID, pageNumber);
 			var div = document.createElement('div');
 			div.id = this.getPageDivID(pageNumber);
 			div.className = "smallpage";
@@ -129,32 +35,34 @@
 		}
 		this.addPhoto = function(pageID, photoID, photoInstanceID)
 		{
-			this.pages[parseInt(pageID)].photos.push(AdminPhotoManager.getPhotoInstance(photoID, photoInstanceID));
+			var pageIDindex = AdminPhotoManager.getPhotoInstanceDivID(photoID, photoInstanceID);
+			this.pages[parseInt(pageID)].photos[pageIDindex] = AdminPhotoManager.getPhotoInstance(photoID, photoInstanceID);
 		}
 		this.addArticle = function(pageID, articleID, articleInstanceID)
 		{
-			this.pages[parseInt(pageID)].articles.push(AdminArticleManager.getArticleInstance(articleID, articleInstanceID));
+			var pageIDindex = AdminArticleManager.getArticleInstanceDivID(articleID, articleInstanceID);
+			this.pages[parseInt(pageID)].articles[pageIDindex] = AdminArticleManager.getArticleInstance(articleID, articleInstanceID);
 		}
 		this.removePhotoInstance = function(pageID, photoID, photoInstanceID)
 		{
-			for (var photoInstanceIndex = 0; photoInstanceIndex < this.pages[pageID].photos.length; photoInstanceIndex++)
+			for (var photoPageID in this.pages[pageID].photos)
 			{
-				var photoInstanceObj = this.pages[pageID].photos[photoInstanceIndex];
+				var photoInstanceObj = this.pages[pageID].photos[photoPageID];
 				if (photoInstanceObj["photoID"] == photoID && photoInstanceObj["photoInstanceID"] == photoInstanceID)
 				{
-					this.pages[pageID].photos.splice(photoInstanceIndex, 1);
+					delete this.pages[pageID].photos[photoPageID];
 					return;
 				}
 			}
 		}
 		this.removeArticleInstance = function(pageID, articleID, articleInstanceID)
 		{
-			for (var articleInstanceIndex = 0; articleInstanceIndex < this.pages[pageID].articles.length; articleInstanceIndex++)
+			for (var articlePageID in this.pages[pageID].articles)
 			{
-				var articleInstanceObj = this.pages[pageID].articles[articleInstanceIndex];
+				var photoInstanceObj = this.pages[pageID].articles[articlePageID];
 				if (articleInstanceObj.parentID == articleID && articleInstanceObj.instanceID == articleInstanceID)
 				{
-					this.pages[pageID].articles.splice(articleInstanceIndex, 1);
+					delete this.pages[pageID].articles[articlePageID];
 					return;
 				}
 			}
@@ -181,24 +89,15 @@
 				isNewPage = (pageObj.pageNumber == newPage);
 				if (isOldPage || isNewPage)
 				{
-					for (var pagePhotoIndex = 0; pagePhotoIndex < pageObj.photos.length; pagePhotoIndex++)
+					for (var photoPageID in pageObj.photos)
 					{
-						var divID = AdminPhotoManager.getPhotoInstanceWrapperDivID(pageObj.photos[pagePhotoIndex].parentID, pageObj.photos[pagePhotoIndex].instanceID);
-						//if (isOldPage)
-						//	$("#" + divID).appendTo("body");
-						StackOrderManager.toggleVisibilityOnPageSwitch(g_photoObjectType, isNewPage, pageObj.photos[pagePhotoIndex].parentID, pageObj.photos[pagePhotoIndex].instanceID);
-						/*if (isNewPage)
-						{
-							if (pageObj.photos[pagePhotoIndex].ipadOrientation == "horizontal")
-								$("#" + divID).appendTo("#HorizontalPageLayout");
-							else if (pageObj.photos[pagePhotoIndex].ipadOrientation == "vertical")
-								$("#" + divID).appendTo("#VerticalPageLayout");
-						}*/
+						var divID = AdminPhotoManager.getPhotoInstanceWrapperDivID(pageObj.photos[photoPageID].parentID, pageObj.photos[photoPageID].instanceID);
+						StackOrderManager.toggleVisibilityOnPageSwitch(g_photoObjectType, isNewPage, pageObj.photos[photoPageID].parentID, pageObj.photos[photoPageID].instanceID);
 					}
-					for (var pageArticleIndex = 0; pageArticleIndex < pageObj.articles.length; pageArticleIndex++)
+					for (var articlePageID in pageObj.articles)
 					{
-						var divID = AdminArticleManager.getArticleInstanceDivID(pageObj.articles[pageArticleIndex].parentID, pageObj.articles[pageArticleIndex].instanceID);
-						StackOrderManager.toggleVisibilityOnPageSwitch(g_articleObjectType, isNewPage, pageObj.articles[pageArticleIndex].parentID, pageObj.articles[pageArticleIndex].instanceID);
+						var divID = AdminArticleManager.getArticleInstanceDivID(pageObj.articles[articlePageID].parentID, pageObj.articles[articlePageID].instanceID);
+						StackOrderManager.toggleVisibilityOnPageSwitch(g_articleObjectType, isNewPage, pageObj.articles[articlePageID].parentID, pageObj.articles[articlePageID].instanceID);
 						if (DocumentClickManager.getMode() == "text")
 							removeJQueryEvents("#" + divID, "#" + divID);
 						else if (DocumentClickManager.getMode() == "default")
@@ -206,23 +105,21 @@
 					}
 				}
 			}
-			//alert(this.pages[newPageID].reattachedPhotos);
-			//this.pages[newPageID].reattachedPhotos = true;
 		}
 		this.redrawPageImages = function()
 		{
 			var pageID = this.getPageIDfromPagenum(g_pageNum);
-			for (var photoInstanceIndex = 0; photoInstanceIndex < this.pages[parseInt(pageID)].photos.length; photoInstanceIndex++)
+			for (var photoPageID in this.pages[parseInt(pageID)].photos)
 			{
-				var instanceObj = this.pages[parseInt(pageID)].photos[photoInstanceIndex];
+				var instanceObj = this.pages[parseInt(pageID)].photos[photoPageID];
 				StackOrderManager.setPhotoStackOrderInsideIpad(AdminPhotoManager.getPhotoInstanceWrapperDivID(instanceObj.parentID, instanceObj.instanceID), instanceObj.parentID, instanceObj.instanceID);
 			}
 		}
 		this.updateAllPageArticleModes = function(new_mode)
 		{
 			var pageObj = this.pages[this.getCurrentPageID()];
-			for (var pageArticleIndex = 0, lastArticleIndex = pageObj.articles.length; pageArticleIndex < lastArticleIndex; pageArticleIndex++)
-				this.updatePageArticleMode(new_mode, pageObj.articles[pageArticleIndex].parentID, pageObj.articles[pageArticleIndex].instanceID);
+			for (var articlePageID in this.pages[parseInt(pageObj.ID)].articles)
+				this.updatePageArticleMode(new_mode, pageObj.articles[articlePageID].parentID, pageObj.articles[articlePageID].instanceID);
 		}
 		this.updatePageArticleMode = function(new_mode, parentID, instanceID)
 		{
@@ -397,7 +294,8 @@
 		this.articleHash = {};
 		this.getNextArticleInstanceID = function(articleID)
 		{
-			return this.articleHash[articleID].instances.length + 1;
+			return "dummyvar";
+			//return this.articleHash[articleID].instances.length + 1;
 		}
 		this.getArticleIDfromDivID = function(divID)
 		{
@@ -427,7 +325,7 @@
 		}
 		this.getArticleInstance = function(articleID, articleInstanceID)
 		{
-			return this.articleHash[articleID].instances[(parseInt(articleInstanceID) - 1)];
+			return this.articleHash[articleID].instances[articleInstanceID];
 		}
 		this.getArticle = function(articleID)
 		{
@@ -504,12 +402,12 @@
 			if (!this.articleHash[articleID])
 				this.articleHash[articleID] = new article(articleID);
 			var isNewArticle;
-			if (articleInstanceID >= this.articleHash[articleID].instances.length)
+			if (!(articleInstanceID in this.articleHash[articleID].instances))
 			{
-				this.articleHash[articleID].instances[articleInstanceID - 1] = new objectInstance(articleID, articleInstanceID, g_articleObjectType);
+				this.articleHash[articleID].instances[articleInstanceID] = new objectInstance(articleID, articleInstanceID, g_articleObjectType);
 				isNewArticle = true;
 			}
-			var articleInstanceObj = this.articleHash[articleID].instances[articleInstanceID - 1];
+			var articleInstanceObj = this.articleHash[articleID].instances[articleInstanceID];
 			articleInstanceObj.pageID = pageID;
 			articleInstanceObj.orientation = orientation;
 			articleInstanceObj.Xcoord = Xcoord;
@@ -598,10 +496,7 @@
 		this.removeArticleInstance = function(articleID, articleInstanceID, pageID)
 		{
 			articleID = parseInt(articleID), articleInstanceID = parseInt(articleInstanceID);
-			if (articleInstanceID == this.articleHash[articleID].instances.length)
-				this.articleHash[articleID].instances.pop();
-			else
-				this.articleHash[articleID].instances.splice(articleInstanceID - 1, 1);
+			delete this.articleHash[articleID].instances[articleInstanceID];
 			PageManager.removeArticleInstance(pageID, articleID, articleInstanceID);
 		}
 	}
@@ -626,12 +521,12 @@
 			var isNewInstance;
 			if (this.photoHash[photoIndex])
 			{
-				if (photoInstanceID > this.photoHash[photoIndex].instances.length)
+				if (!(photoInstanceID in this.photoHash[photoIndex].instances))
 				{
-					isNewInstance = true;// (this.photoHash[photoIndex].instances.length == photoInstanceID);
-					this.photoHash[photoIndex].instances[photoInstanceID - 1] = new objectInstance(photoIndex, photoInstanceID, g_photoObjectType);
+					isNewInstance = true;
+					this.photoHash[photoIndex].instances[photoInstanceID] = new objectInstance(photoIndex, photoInstanceID, g_photoObjectType);
 				}
-				var instance = this.photoHash[photoIndex].instances[photoInstanceID - 1];
+				var instance = this.photoHash[photoIndex].instances[photoInstanceID];
 				instance.pageID = pageID;
 				instance.ipadOrientation = ipadOrientation;
 				instance.Xcoord = parseFloat(Xcoord);
@@ -662,11 +557,12 @@
 		}
 		this.getPhotoInstance = function(photoIndex, photoInstanceID)
 		{
-			return this.photoHash[photoIndex].instances[(parseInt(photoInstanceID) - 1)];
+			return this.photoHash[photoIndex].instances[photoInstanceID];
 		}
 		this.getNextPhotoInstanceID = function(photoIndex)
 		{
-			return this.photoHash[photoIndex].instances.length + 1;
+			return "dummyvar";
+			//return this.photoHash[photoIndex].instances.length + 1;
 		}
 		this.getPhotoInstanceWrapperDivID = function(photoIndex, photoInstanceID)
 		{
@@ -820,10 +716,7 @@
 		this.removePhotoInstance = function(photoID, photoInstanceID, pageID)
 		{
 			photoID = parseInt(photoID), photoInstanceID = parseInt(photoInstanceID);
-			if (photoInstanceID == this.photoHash[photoID].instances.length)
-				this.photoHash[photoID].instances.pop();
-			else
-				this.photoHash[photoID].instances.splice(photoInstanceID - 1, 1);
+			delete this.photoHash[photoID].instances[photoInstanceID];
 			PageManager.removePhotoInstance(pageID, photoID, photoInstanceID);
 		}
 		
@@ -834,9 +727,9 @@
 			var thisPhotoInstanceObj = this.getPhotoInstance(thisPhotoIndex, thisPhotoInstanceID);
 			var pageID = PageManager.getCurrentPageID();
 			var newStackOrder = 0;
-			for (var photoInstanceIndex = 0; photoInstanceIndex < PageManager.pages[pageID].photos.length; photoInstanceIndex++)
+			for (var photoPageID in PageManager.pages[pageID].photos)
 			{
-				var instanceObj = PageManager.pages[pageID].photos[photoInstanceIndex];
+				var instanceObj = PageManager.pages[pageID].photos[photoPageID];
 				newStackOrder = (instanceObj.stackOrder > newStackOrder) ? instanceObj.stackOrder : newStackOrder;
 				if (instanceObj.parentID == thisPhotoInstanceObj.parentID && instanceObj.instanceID == thisPhotoInstanceObj.instanceID)
 					continue;

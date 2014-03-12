@@ -6,8 +6,15 @@
 <head>
 	<title>Book</title>
 	<script src="http://code.jquery.com/jquery-2.1.0.js"></script>
+	<script src="admin/BasicDataStructures.js"></script>
 	<script>
 <?
+
+/************************************************
+*	NOTE: All this server code will be moved    *
+*	to an AJAX request eventually.              *
+************************************************/
+
 	$BookID = $_GET['bookID'];
 	if ($BookID == "" || !is_numeric($BookID))
 	{
@@ -16,10 +23,10 @@
 	}
 	else
 	{
-		echo "var loaded = true";
+		echo "var loaded = true;";
 		$bookTitle = "";
 		$bookAuthor = "";
-		$query_str = "SELECT BookTitleTitle, BookTitleAuthor, BookDefaultLangID, BookDefaultPageID 
+		$query_str = "SELECT BookLoginUsername as BookURLprefix, BookTitleTitle, BookTitleAuthor, BookDefaultLangID, BookDefaultPageID 
 					FROM BookTitleLangs 
 					INNER JOIN Books 
 					ON BookTitleLangs.BookID = Books.BookID 
@@ -30,6 +37,7 @@
 		$row = $book_title_sql->fetch_assoc();
 		if ($row)
 		{
+			$BookURLprefix = $row['BookURLprefix'];
 			$BookTitle = $row['BookTitleTitle'];
 			$BookAuthor = $row['BookTitleAuthor'];
 			$BookDefaultLangID = $row['BookDefaultLangID'];
@@ -37,63 +45,45 @@
 		}
 	}
 ?>
+		var g_bookID = "<?=$BookID?>";
+		var g_bookLang = "<?=$BookDefaultLangID?>";
+		var g_imageRoot = "<?=$g_image_web_location . '/' . $BookURLprefix . '/'?>";
+		var g_photoObjectType = "<?=$g_photo_object_name?>";
+		var g_articleObjectType = "<?=$g_article_object_name?>";
 
-		var ClientCommunicator = new function()
-		{
-			this.getData = function(dataToSend)
-			{
-				$.ajax({
-					type : "POST",
-					url : "admin/loadAllData.php",
-					data: JSON.stringify(dataToSend),
-					dataType : "html", // data type to be returned
-					contentType: "application/json",
-					success: function(data) {
-						//alert( data ); // shows whole dom
-						ClientCommunicator.showDataFromServer( data );
-						//alert( $(data).find('#wrapper').html() ); // returns null
-					},
-					error: function(jqXHR, exception)
-					{
-						var ErrString = "Sorry, The requested property could not be found\n";
-						if (jqXHR.status === 0)
-							ErrString += 'Not connect.\n Verify Network.';
-						else if (jqXHR.status == 404)
-							ErrString += 'Requested page not found. [404]';
-						else if (jqXHR.status == 500)
-							ErrString += 'Internal Server Error [500].';
-						else if (exception === 'parsererror')
-							ErrString += 'Requested JSON parse failed.';
-						else if (exception === 'timeout')
-							ErrString += 'Time out error.';
-						else if (exception === 'abort')
-							ErrString += 'Ajax request aborted.';
-						else
-							ErrString += 'Uncaught Error.\n' + jqXHR.responseText;
-						alert(ErrString);
-						alert(exception);
-					}
-				});
-			}
-			
-			this.showDataFromServer = function(serverdata)
-			{
-				alert(serverdata);
-			}
-		}
-		
+	</script>
+	<script src="ClientDataStructures.js"></script>
+	<script>
 		$(document).ready(function()
 		{
 			if (loaded)
-				ClientCommunicator.getData({loadPageData: 'true', pageID:'<?=$BookDefaultPageID?>', bookID: '<?=$BookID?>', bookLang: '<?=$BookDefaultLangID?>'});
+			{
+				PageManager.setCurrentPage(<?=$BookDefaultPageID?>);
+				ClientCommunicator.getData({loadPageData: 'true', pageID:'<?=$BookDefaultPageID?>', BookID: g_bookID, BookLang: g_bookLang});
+				ClientCommunicator.getData({loadPages: 'true', BookID: g_bookID});
+				ClientCommunicator.getData({loadPhotos: 'true', BookID: g_bookID, BookLang: g_bookLang});
+				ClientCommunicator.getData({loadPhotoInstances: 'true', BookID: g_bookID, BookLang: g_bookLang});
+				ClientCommunicator.getData({loadArticles: 'true', BookID: g_bookID, BookLang: g_bookLang});
+				ClientCommunicator.getData({loadArticleInstances: 'true', BookID: g_bookID, BookLang: g_bookLang});
+				PageManager.init();
+			}
 			else
 				onload();
 		});
 	</script>
 </head>
 <body>
-<h1><?=$BookTitle?></h1>
-<h4><i><?=$BookAuthor?></i></h4>
+<table>
+<tr><td>
+	<h1><?=$BookTitle?></h1>
+	<h4><i><?=$BookAuthor?></i></h4>
+</td><td id="selectPageContainer">
+	<select id="selectPage" onchange="PageManager.setCurrentPage(this.value)"></select>
+</td></tr>
+<tr><td>
+	<div id="photoBookBody"></div>
+</td></tr>
+</table>
 </body>
 </html>
 <? include("dbclose.php") ?>

@@ -11,6 +11,7 @@
 <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 <script src="Server.js"></script>
 <script src="MouseEvents.js"></script>
+<script src="BasicDataStructures.js"></script>
 <script src="DataStructures.js"></script>
 <script>
 	var g_pageNum;
