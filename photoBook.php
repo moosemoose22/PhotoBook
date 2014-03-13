@@ -2,6 +2,7 @@
 	include("_sharedIncludes/dbconnect.php");
 	include("_sharedIncludes/globals.php");
 ?>
+<!DOCTYPE html>
 <html>
 <head>
 	<title>Book</title>
@@ -58,7 +59,6 @@
 		{
 			if (loaded)
 			{
-				PageManager.setCurrentPage(<?=$BookDefaultPageID?>);
 				ClientCommunicator.getData({loadPageData: 'true', pageID:'<?=$BookDefaultPageID?>', BookID: g_bookID, BookLang: g_bookLang});
 				ClientCommunicator.getData({loadPages: 'true', BookID: g_bookID});
 				ClientCommunicator.getData({loadPhotos: 'true', BookID: g_bookID, BookLang: g_bookLang});
@@ -72,7 +72,7 @@
 		});
 	</script>
 </head>
-<body>
+<body style="overflow-y: auto; overflow-x: hidden">
 <table>
 <tr><td>
 	<h1><?=$BookTitle?></h1>

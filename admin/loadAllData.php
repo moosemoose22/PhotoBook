@@ -225,6 +225,7 @@
 		$pageDataArray["photoinstances"] = loadPhotoInstances($BookID, $PageID);
 		$pageDataArray["articleinstances"] = loadArticleInstances($BookID, $PageID);
 		$pageDataArray["stackorder"] = loadStackOrder($BookID, $PageID);
+		$pageDataArray["setcurrentpage"] = $PageID;
 		return $pageDataArray;
 	}
 

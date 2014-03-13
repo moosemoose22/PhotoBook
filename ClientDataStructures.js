@@ -108,8 +108,9 @@
 								dataHash['objectType'], dataHash['orientation'], dataHash['stackOrder']);
 						}
 					}
+					else if (datasetName == "setcurrentpage")
+						PageManager.setCurrentPage(allDataSetsObj[datasetName]);
 				}
-				PageManager.showCurrentPage();
 			}
 		}
 
@@ -192,66 +193,62 @@
 			}
 			this.setCurrentPage = function(pageID)
 			{
-				this.currentPage = pageID;
-				this.showCurrentPage();
+				this.showHideLoadPage(this.currentPage, true, false, "horizontal");
+				this.currentPage = parseInt(pageID);
+				this.showHideLoadPage(this.currentPage, true, true, "horizontal");
 			}
-			this.showCurrentPage = function()
+			this.loadPageObjects = function()
 			{
-				if (!this.currentPage)
+				for (var pageID in this.pages)
+					this.showHideLoadPage(pageID, true, false, "");
+			}
+			this.showHideLoadPage = function(pageID, loadingPage, showOrHide, orientation)
+			{
+				if (!pageID)
 					return;
-				var page = this.pages[this.currentPage];
+				var page = this.pages[pageID];
 				if (!page)
 					return;
 				var photoObj, articleObj, photoInstanceObj, articleInstanceObj;
 				var oImg, oArticle;
 				var root=document.getElementsByTagName('body')[0];
-				//var root=document.getElementById("photoBookBody");
-				$("#photoBookBody").html("");
 				for (var pagePhotoID in page.photos)
 				{
 					photoInstanceObj = page.photos[pagePhotoID];
 					photoObj = ObjectManager.photos[photoInstanceObj.parentID];
-					oImg = document.createElement('img');
-					oImg.id = pagePhotoID;
-					oImg.setAttribute('src', this.imageRoot + photoObj.URL);
-					oImg.style.position='absolute';
-					oImg.style.left = photoInstanceObj.Xcoord;
-					oImg.style.top = photoInstanceObj.Ycoord;
-					oImg.style.zIndex = photoInstanceObj.stackOrder;
-					//oImg.style.display = (photoInstanceObj.orientation == "horizontal") ? "" : "none";
-					$("#photoBookBody").append("<img src='" + this.imageRoot + photoObj.URL + "' />").css({
-						position: 'absolute',
-						left: photoInstanceObj.Xcoord,
-						top: photoInstanceObj.Ycoord,
-						"z-index": photoInstanceObj.stackOrder
-					});
+					if (loadingPage)
+					{
+						$("body").append("<img style=\"display:none\" style=\"position: absolute\" id=\"" + pagePhotoID + "\" src='" +
+								this.imageRoot + photoObj.URL + "' />")
+							.css("z-index", photoInstanceObj.stackOrder)
+							.offset({top: photoInstanceObj.Ycoord, left: photoInstanceObj.Xcoord});
+					}
+					if (showOrHide && photoInstanceObj.orientation == orientation)
+						$("#" + pagePhotoID).show();
+					else
+						$("#" + pagePhotoID).hide();
 					//root.appendChild(oImg);
 				}
 				for (var pageArticleID in page.articles)
 				{
-					articleInstanceObj = page.photos[pagePhotoID];
+					articleInstanceObj = page.articles[pageArticleID];
 					articleObj = ObjectManager.articles[articleInstanceObj.parentID];
-					oArticle = document.createElement('div');
-					oArticle.id = pageArticleID;
-					oArticle.style.position='absolute';
-					oArticle.innerHTML = "<h4>" + articleObj.title + "</h4>" + articleObj.text;
-					oArticle.style.left = articleInstanceObj.Xcoord;
-					oArticle.style.top = articleInstanceObj.Ycoord;
-					oArticle.style.width = articleInstanceObj.width;
-					oArticle.style.height = articleInstanceObj.height;
-					oArticle.style.zIndex = articleInstanceObj.stackOrder;
-					oArticle.style.overflowY = "auto";
-					//root.appendChild(oArticle);
-					$("#photoBookBody").append("<div id='" + pageArticleID + "'>" +
-							"<h4>" + articleObj.title + "</h4>" + articleObj.text + "</div>").css({
-						position: 'absolute',
-						left: articleInstanceObj.Xcoord,
-						top: articleInstanceObj.Ycoord,
-						width: articleInstanceObj.width,
-						height: articleInstanceObj.height,
-						"ovreflow-y": "auto",
-						"z-index": photoInstanceObj.stackOrder
-					});
+					if (loadingPage)
+					{
+						$("body").append("<div style=\"display:none\" id=\"" + pageArticleID + "\">" +
+								"<h4>" + articleObj.title + "</h4>" + articleObj.text + "</div>");
+							$("#" + pageArticleID).css({
+								position: 'absolute',
+								width: articleInstanceObj.width,
+								height: articleInstanceObj.height,
+								"overflow-y": "auto",
+								"z-index": articleInstanceObj.stackOrder})
+							.offset({top: articleInstanceObj.Ycoord, left: articleInstanceObj.Xcoord});
+					}
+					if (showOrHide && articleInstanceObj.orientation == orientation)
+						$("#" + pageArticleID).show();
+					else
+						$("#" + pageArticleID).hide();
 				}
 			}
 			this.updateAvailablePages = function()
@@ -325,24 +322,26 @@
 					return this.articles[ID].instances[instanceID];
 				}
 			}
-			this.processPhotoInstance = function(ID, instanceID, pageID, orientation, XCoord, YCoord, width, height, stretchToFill)
+			this.processPhotoInstance = function(ID, instanceID, pageID, orientation, Xcoord, Ycoord, width, height, stretchToFill)
 			{
 				PageManager.addObject(ID, instanceID, pageID, g_photoObjectType);
 				var photoInstance = this.getObjectInstance(ID, instanceID, g_photoObjectType);
 				photoInstance.pageID = pageID;
 				photoInstance.orientation = orientation;
-				photoInstance.XCoord = XCoord;
+				photoInstance.Xcoord = Xcoord;
+				photoInstance.Ycoord = Ycoord;
 				photoInstance.width = width;
 				photoInstance.height = height;
 				photoInstance.stretchToFill = stretchToFill;
 			}
-			this.processArticleInstance = function(ID, instanceID, pageID, orientation, XCoord, YCoord, width, height, stretchToFill)
+			this.processArticleInstance = function(ID, instanceID, pageID, orientation, Xcoord, Ycoord, width, height, stretchToFill)
 			{
 				PageManager.addObject(ID, instanceID, pageID, g_articleObjectType);
 				var articleInstance = this.getObjectInstance(ID, instanceID, g_articleObjectType);
 				articleInstance.pageID = pageID;
 				articleInstance.orientation = orientation;
-				articleInstance.XCoord = XCoord;
+				articleInstance.Xcoord = Xcoord;
+				articleInstance.Ycoord = Ycoord;
 				articleInstance.width = width;
 				articleInstance.height = height;
 				articleInstance.stretchToFill = stretchToFill;
