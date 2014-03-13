@@ -68,19 +68,20 @@
 			return array_push($photo_instance_array, array("error" => "PhotoInstance has no book ID"));
 		$mysqli = $GLOBALS["mysqli"];
 		// Page photo population **********************************
-		$pix_str = "SELECT BookPhotoID, BookPagePhotoInstanceNum, BookPageID, BookPagePhotoIpadOrientation, 
+		$pix_str = "SELECT bpp.BookPhotoID, BookPagePhotoInstanceNum, BookPageID, BookPagePhotoIpadOrientation, 
 					BookPagePhotoXCoord, BookPagePhotoYCoord, BookPagePhotoWidth, BookPagePhotoHeight,
-					IF(BookPagePhotoStretchToFill,'true','false') as BookPagePhotoStretchToFill
-					FROM BookPagePhotos
+					IF(BookPagePhotoStretchToFill,'true','false') as BookPagePhotoStretchToFill,
+					BookPhotoURL
+					FROM BookPagePhotos bpp
+					INNER JOIN BookPhotos bp
+					ON bpp.BookPhotoID = bp.BookPhotoID
 					WHERE ";
 		if (!is_null($PageID))
 			$pix_str .= "BookPageID = {$PageID} AND ";
-		$pix_str .= "BookPhotoID IN
-						(SELECT BookPhotoID
-						FROM BookPhotos
-						WHERE BookID = " . $BookID . ")
-					ORDER BY BookPhotoID, BookPagePhotoInstanceNum;";
-	
+		$pix_str .= "BookID = " . $BookID .
+					" ORDER BY bpp.BookPhotoID, BookPagePhotoInstanceNum;";
+		//printErrorMessageToClient($pix_str);
+		//return;
 		$images_sql = $mysqli->query($pix_str);
 		while ($row = $images_sql->fetch_assoc())
 		{
@@ -93,6 +94,7 @@
 						"Ycoord" => $row['BookPagePhotoYCoord'],
 						"width" => $row['BookPagePhotoWidth'],
 						"height" => $row['BookPagePhotoHeight'],
+						"URL" => bookImageName($row['BookPageID'], $row['BookPagePhotoInstanceNum'], $row['BookPhotoURL']),
 						"stretchToFill" => $row['BookPagePhotoStretchToFill']
 				)
 			);

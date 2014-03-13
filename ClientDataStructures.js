@@ -86,7 +86,7 @@
 							dataHash = datasetArray[count];
 							ObjectManager.processPhotoInstance(dataHash['ID'], dataHash['instanceID'], dataHash['pageID'],
 								dataHash['orientation'], dataHash['Xcoord'], dataHash['Ycoord'], dataHash['width'],
-								dataHash['height'], dataHash['stretchToFill']);
+								dataHash['height'], dataHash['URL'], dataHash['stretchToFill']);
 						}
 					}
 					else if (datasetName == "articleinstances")
@@ -215,11 +215,10 @@
 				for (var pagePhotoID in page.photos)
 				{
 					photoInstanceObj = page.photos[pagePhotoID];
-					photoObj = ObjectManager.photos[photoInstanceObj.parentID];
 					if (loadingPage)
 					{
 						$("body").append("<img style=\"display:none\" style=\"position: absolute\" id=\"" + pagePhotoID + "\" src='" +
-								this.imageRoot + photoObj.URL + "' />")
+								this.imageRoot + photoInstanceObj.URL + "' />")
 							.css("z-index", photoInstanceObj.stackOrder)
 							.offset({top: photoInstanceObj.Ycoord, left: photoInstanceObj.Xcoord});
 					}
@@ -322,7 +321,7 @@
 					return this.articles[ID].instances[instanceID];
 				}
 			}
-			this.processPhotoInstance = function(ID, instanceID, pageID, orientation, Xcoord, Ycoord, width, height, stretchToFill)
+			this.processPhotoInstance = function(ID, instanceID, pageID, orientation, Xcoord, Ycoord, width, height, URL, stretchToFill)
 			{
 				PageManager.addObject(ID, instanceID, pageID, g_photoObjectType);
 				var photoInstance = this.getObjectInstance(ID, instanceID, g_photoObjectType);
@@ -332,6 +331,7 @@
 				photoInstance.Ycoord = Ycoord;
 				photoInstance.width = width;
 				photoInstance.height = height;
+				photoInstance.URL = URL;
 				photoInstance.stretchToFill = stretchToFill;
 			}
 			this.processArticleInstance = function(ID, instanceID, pageID, orientation, Xcoord, Ycoord, width, height, stretchToFill)

@@ -38,6 +38,7 @@
 		this.width;
 		this.height;
 		this.stackOrder;
+		this.URL;
 		this.stretchToFill;
 	}
 
