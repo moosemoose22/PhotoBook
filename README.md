@@ -8,7 +8,8 @@ Photo e-book creation software
 
 
 **Front-end page to view e-book**  
-*book2.php--*	The main page of the front end. Required URL values: bookID and pageNum.
+*photoBook.php--*	The main page of the front end. Required URL value: bookID.
+*clientDataStructures.php--*	The main JavaScript for the front end.
 
 **Database description file**  
 *PhotoBook.sql--*	SQL of all tables used in PhotoBook
@@ -40,7 +41,7 @@ Photo e-book creation software
 
 
 **Admin main server pages:**  
-*loadAllData.php--*		Loads all data on login.  
+*loadAllData.php--*		Loads all data on login. Used by both front-end e-book and admin console for e-book.  
 						Including:
 *						all pages in photo book and necessary associated information  
 *						location of articles/captions/photos on a page  
