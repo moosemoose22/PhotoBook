@@ -7,9 +7,9 @@ Photo e-book creation software
 >There are 2 products here: a product that shows an e-book over the web and a product that allows users to design an e-book.
 
 
-**Front-end page to view e-book**  
+**Front-end pages to view e-book**  
 *photoBook.php--*	The main page of the front end. Required URL value: bookID.  
-*clientDataStructures.php--*	The main JavaScript for the front end.
+*clientDataStructures.php--*	The main JavaScript page for the front end.
 
 **Database description file**  
 *PhotoBook.sql--*	SQL of all tables used in PhotoBook
