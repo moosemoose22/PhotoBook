@@ -8,7 +8,7 @@ Photo e-book creation software
 
 
 **Front-end page to view e-book**  
-*photoBook.php--*	The main page of the front end. Required URL value: bookID.
+*photoBook.php--*	The main page of the front end. Required URL value: bookID.  
 *clientDataStructures.php--*	The main JavaScript for the front end.
 
 **Database description file**  
