@@ -73,12 +73,12 @@
 	</script>
 </head>
 <body style="overflow-y: auto; overflow-x: hidden">
-<table>
+<table style="position: absolute; left: 0px; right: 0px;">
 <tr><td>
 	<h1><?=$BookTitle?></h1>
 	<h4><i><?=$BookAuthor?></i></h4>
 </td><td id="selectPageContainer">
-	<select id="selectPage" onchange="PageManager.setCurrentPage(this.value)"></select>
+	<select id="selectPage" onchange="PageManager.setCurrentPage(this.value, false)"></select>
 </td></tr>
 <tr><td>
 	<div id="photoBookBody"></div>

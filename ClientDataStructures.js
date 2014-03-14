@@ -12,9 +12,7 @@
 					dataType : "json", // data type to be returned
 					contentType: "application/json",
 					success: function(data) {
-						//alert( data ); // shows whole dom
 						ClientCommunicator.showDataFromServer( data );
-						//alert( $(data).find('#wrapper').html() ); // returns null
 					},
 					error: function(jqXHR, exception)
 					{
@@ -109,8 +107,9 @@
 						}
 					}
 					else if (datasetName == "setcurrentpage")
-						PageManager.setCurrentPage(allDataSetsObj[datasetName]);
+						PageManager.setCurrentPage(allDataSetsObj[datasetName], true);
 				}
+				PageManager.loadPageObjects();
 			}
 		}
 
@@ -191,11 +190,12 @@
 				var objectHashIndex = ObjectManager.getDivID(ID, instanceID, objectType);
 				objectHash[objectHashIndex] = ObjectManager.getObjectInstance(ID, instanceID, objectType);
 			}
-			this.setCurrentPage = function(pageID)
+			this.setCurrentPage = function(pageID, loadingPage)
 			{
-				this.showHideLoadPage(this.currentPage, true, false, "horizontal");
+				if (this.currentPage)
+					this.showHideLoadPage(this.currentPage, loadingPage, false, "horizontal");
 				this.currentPage = parseInt(pageID);
-				this.showHideLoadPage(this.currentPage, true, true, "horizontal");
+				this.showHideLoadPage(this.currentPage, loadingPage, true, "horizontal");
 			}
 			this.loadPageObjects = function()
 			{
@@ -210,8 +210,6 @@
 				if (!page)
 					return;
 				var photoObj, articleObj, photoInstanceObj, articleInstanceObj;
-				var oImg, oArticle;
-				var root=document.getElementsByTagName('body')[0];
 				for (var pagePhotoID in page.photos)
 				{
 					photoInstanceObj = page.photos[pagePhotoID];
@@ -223,10 +221,16 @@
 							.offset({top: photoInstanceObj.Ycoord, left: photoInstanceObj.Xcoord});
 					}
 					if (showOrHide && photoInstanceObj.orientation == orientation)
-						$("#" + pagePhotoID).show();
+					{
+						// For some reason onPageLoad, Safari (and maybe other browsers) won't show this image
+						// unless we take it out of this function and show it asynchronously
+						if (loadingPage)
+							setTimeout(function(){$("#" + pagePhotoID).show();}, 100);
+						else
+							$("#" + pagePhotoID).show();
+					}
 					else
 						$("#" + pagePhotoID).hide();
-					//root.appendChild(oImg);
 				}
 				for (var pageArticleID in page.articles)
 				{

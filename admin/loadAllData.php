@@ -77,7 +77,7 @@
 					ON bpp.BookPhotoID = bp.BookPhotoID
 					WHERE ";
 		if (!is_null($PageID))
-			$pix_str .= "BookPageID = {$PageID} AND ";
+			$pix_str .= "BookPageID = {$PageID} AND BookPagePhotoIpadOrientation != 'outside' AND ";
 		$pix_str .= "BookID = " . $BookID .
 					" ORDER BY bpp.BookPhotoID, BookPagePhotoInstanceNum;";
 		//printErrorMessageToClient($pix_str);
@@ -151,7 +151,7 @@
 						FROM BookPageArticles pageArticles
 						WHERE ";
 		if (!is_null($PageID))
-			$articles_instance_str .= "pageArticles.BookPageID = {$PageID} AND ";
+			$articles_instance_str .= "pageArticles.BookPageID = {$PageID} AND BookPageArticleIpadOrientation <> 'outside' AND ";
 		$articles_instance_str .= "pageArticles.BookArticleID IN
 							(SELECT BookArticleID
 							FROM BookArticles
