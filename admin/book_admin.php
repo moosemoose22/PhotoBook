@@ -7,8 +7,8 @@
 <html>
 <head>
 <title>Photobook admin</title>
-<script src="http://code.jquery.com/jquery-1.11.0.js"></script>
-<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<script src="http://code.jquery.com/jquery-2.1.0.js"></script>
+<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 <script src="Server.js"></script>
 <script src="MouseEvents.js"></script>
 <script src="BasicDataStructures.js"></script>
@@ -246,12 +246,16 @@
 	
 	function removeJQueryEvents(UIelement1, UIelement2)
 	{
-		if ($(UIelement1).data('uiDraggable'))
-		{
-			$(UIelement1).draggable( "destroy" );
-			if ($(UIelement2))
-				$(UIelement2).resizable( "destroy" );
-		}
+		//if ($(UIelement1).data('uiDraggable'))
+		//	$(UIelement1).draggable( "destroy" );
+		//if ($(UIelement1).data('draggable'))
+		//	$(UIelement1).draggable.remove();
+		//if ($(UIelement2).data('resizable'))
+		//	$(UIelement2).resizable.remove();
+		if ($(UIelement1).hasClass("ui-draggable"))
+			$(UIelement1).draggable("destroy");
+		if ($(UIelement2).hasClass('ui-resizable'))
+			$(UIelement2).resizable("destroy");
 		var divID = $(UIelement1).attr("id");
 		if (AdminArticleManager.isArticle(divID))
 		{

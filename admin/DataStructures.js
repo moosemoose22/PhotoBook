@@ -395,7 +395,7 @@
 					this.writeSharedArticle(articleID);
 			}
 		}
-		this.addUpdateArticleInstance = function(articleID, articleInstanceID, pageID, orientation, Xcoord, Ycoord, imgWidth, imgHeight, overwritePlaceholder, writeArticle, loggingIn)
+		this.addUpdateArticleInstance = function(articleID, articleInstanceID, pageID, orientation, Xcoord, Ycoord, imgWidth, imgHeight, writeArticle, loggingIn)
 		{
 			Logger.log(arguments, "function", "from_server", "addUpdateArticleInstance");
 			articleID = parseInt(articleID), articleInstanceID = parseInt(articleInstanceID);
@@ -414,13 +414,7 @@
 			articleInstanceObj.Ycoord = Ycoord;
 			articleInstanceObj.width = imgWidth;
 			articleInstanceObj.height = imgHeight;
-			if (overwritePlaceholder)
-			{
-				var textElementObj = $("#" + DocumentClickManager.currentArticleID);
-				$(textElementObj).attr("id", this.getArticleInstanceDivID(articleID, articleInstanceID));
-				PageManager.updatePageArticleMode("text", articleID, articleInstanceID);
-			}
-			else if (writeArticle)
+			if (writeArticle)
 				this.writeArticle(articleID, articleInstanceID, this.articleHash[articleID].text, orientation, Xcoord, Ycoord, imgWidth, imgHeight, loggingIn);
 			if (!loggingIn)
 				PageManager.addStackOrder(pageID, articleID, articleInstanceID, g_articleObjectType);
@@ -461,8 +455,8 @@
 			$('#' + newname).on("contextmenu", showRightClickMenu);
 			$("#" + newname).on("click", function(event)
 			{
-				g_objectClicked = $(this);
-				DocumentClickManager.articleOnClick($(this), event);
+				g_objectClicked = $("#" + newname);
+				DocumentClickManager.articleOnClick($("#" + newname), event);
 			});
 			/*
 			$("#" + newname).on("blur", function(event)

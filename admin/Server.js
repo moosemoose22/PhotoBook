@@ -307,7 +307,7 @@
 						dataHash = allDataArray[y];
 						var re = new RegExp(g_textDelimeterReplaceAmperstand, 'g');
 						dataHash['text'] = dataHash['text'].replace(re, "&");
-						if (("mode" in dataHash) && dataHash['mode'] == "add")
+						if (isAddingMode && !loggingIn)
 							AdminArticleManager.removeTempTextBoxIfExists();
 						AdminArticleManager.addUpdateArticle(dataHash['ID'], dataHash['title'],
 							dataHash['author'], dataHash['text'], (dataHash['isShared'] == "1"));
@@ -350,7 +350,7 @@
 						dataHash = allDataArray[y];
 						AdminArticleManager.addUpdateArticleInstance(dataHash['ID'], dataHash['instanceID'], dataHash['pageID'],
 							dataHash['orientation'], dataHash['Xcoord'], dataHash['Ycoord'],
-							dataHash['width'], dataHash['height'], dataHash['overwritePlaceholder'], isAddingMode, loggingIn);
+							dataHash['width'], dataHash['height'], isAddingMode, loggingIn);
 					}
 				}
 				else if (datasetName == "stackorder")

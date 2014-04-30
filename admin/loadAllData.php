@@ -65,7 +65,11 @@
 	{
 		$photo_instance_array = array();
 		if (empty($BookID))
-			return array_push($photo_instance_array, array("error" => "PhotoInstance has no book ID"));
+		{
+			printErrorMessageToClient($db_str);
+			return;
+		}
+		//	return array_push($photo_instance_array, array("error" => "PhotoInstance has no book ID"));
 		$mysqli = $GLOBALS["mysqli"];
 		// Page photo population **********************************
 		$pix_str = "SELECT bpp.BookPhotoID, BookPagePhotoInstanceNum, BookPageID, BookPagePhotoIpadOrientation, 

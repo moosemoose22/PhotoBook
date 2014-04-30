@@ -87,21 +87,29 @@
 		// Article instance ID is 1 because a new text box can only have 1 instance
 		$db_str = "INSERT INTO BookPageArticles (BookPageID, BookArticleID, BookPageArticleInstanceNum,
 					BookPageArticleIpadOrientation, BookPageArticleXCoord, BookPageArticleYCoord, BookPageArticleWidth,
-					BookPageArticleHeight, BookPageArticleStackOrder)
+					BookPageArticleHeight)
 					VALUES (" . $client_form_data['pageID'] . ", " . $articleID . ", 1,
 					'" . $client_form_data['orientation'] . "', " . $client_form_data['Xcoord'] . ", " . $client_form_data['Ycoord'] . ",
-					" . $client_form_data['width'] . ", " . $client_form_data['height'] . ", 1);";
+					" . $client_form_data['width'] . ", " . $client_form_data['height'] . ");";
 		$mysqli->query($db_str);
-		$articleInstanceID = $mysqli->insert_id;
+		$articleInstanceID = 1;
 	}	
 	else if ($client_form_data['mode'] == "add_instance")
 	{
+		$db_str = "SELECT MAX(BookPageArticleInstanceNum) as maxInstanceNum
+					FROM BookPageArticles
+					WHERE BookArticleID = " . $articleID . ";";
+		$maxInstanceSQL = $mysqli->query($db_str);
+		$maxInstanceRow = $maxInstanceSQL->fetch_assoc();
+		$articleInstanceID = $maxInstanceRow['maxInstanceNum'] + 1;
+		$maxInstanceSQL->free();
+
 		$db_str = "INSERT INTO BookPageArticles (BookPageID, BookArticleID, BookPageArticleInstanceNum,
 					BookPageArticleIpadOrientation, BookPageArticleXCoord, BookPageArticleYCoord, BookPageArticleWidth,
-					BookPageArticleHeight, BookPageArticleStackOrder)
+					BookPageArticleHeight)
 					VALUES (" . $client_form_data['pageID'] . ", " . $articleID . ", " . $articleInstanceID . ",
 					'" . $client_form_data['orientation'] . "', " . $client_form_data['Xcoord'] . ", " . $client_form_data['Ycoord'] . ",
-					" . $client_form_data['width'] . ", " . $client_form_data['height'] . ", 1);";
+					" . $client_form_data['width'] . ", " . $client_form_data['height'] . ");";
 		$mysqli->query($db_str);
 	}
 
@@ -109,16 +117,16 @@
 	$allDataArray = array();
 	$allDataArray["globals"] = array("loggingIn" => "false", "mode" => $client_form_data['mode']);
 
-	if ($is_shared_instance)
-	{
+	#if ($is_shared_instance)
+	#{
 		$allDataArray["articles"] =
-			array("ID" => $articleID,
+			array(array("ID" => $articleID,
 					"title" => $row['BookArticleLangTitle'],
 					"author" => $row['BookArticleLangAuthor'],
-					"text" => $client_form_data['articleText'],
+					"text" => str_replace("&", $GLOBALS["text_delimiter_replace_amperstand"], $row['BookArticleLangText']),
 					"isShared" => $is_shared_instance
-				);
-	}
+				));
+	#}
 
 	// Need an array of a hash because the client expects all photo instances to be in an array,
 	// whether an array of 1 or an array of a ton
@@ -130,8 +138,7 @@
 			"Xcoord" => $client_form_data['Xcoord'],
 			"Ycoord" => $client_form_data['Ycoord'],
 			"width" => $client_form_data['width'],
-			"height" => $client_form_data['height'],
-			"overwritePlaceholder" => ($client_form_data['mode'] == "add")
+			"height" => $client_form_data['height']
 		));
 	echo json_encode(array("allData" => $allDataArray));
 ?>
